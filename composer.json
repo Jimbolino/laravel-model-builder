@@ -3,6 +3,6 @@
     "description": "builds eloquent models based on the tables and relations found in your mysql database",
     "version": "0.1",
     "autoload": {
-        "psr-4": { "Jimbolino\\Laravel\\ModelBuilder": "src/" }
+        "psr-4": { "Jimbolino\\Laravel\\ModelBuilder\\": "src/" }
     }
 }
