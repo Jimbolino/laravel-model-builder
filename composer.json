@@ -1,4 +1,8 @@
 {
-    "name": "Jimbolino/laravel-model-builder",
-    "version": "0.1"
+    "name": "jimbolino/laravel-model-builder",
+    "description": "builds eloquent models based on the tables and relations found in your mysql database",
+    "version": "0.1",
+    "autoload": {
+        "psr-4": { "Jimbolino\\Laravel\\ModelBuilder": "src/" }
+    }
 }

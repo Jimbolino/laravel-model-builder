@@ -1,13 +1,11 @@
-<?php namespace App\Http\Controllers\Model;
-/**
- * Created by PhpStorm.
- * User: Jim
- * Date: 27-2-2015
- * Time: 02:15
- */
+<?php namespace Jimbolino\Laravel\ModelBuilder;
 
 use ReflectionClass;
 
+/**
+ * Class Model
+ * @package Jimbolino\Laravel\ModelBuilder
+ */
 class Model {
 
     // input

@@ -1,8 +1,7 @@
-<?php namespace App\Http\Controllers\Model;
+<?php namespace Jimbolino\Laravel\ModelBuilder;
 
 use App\Http\Controllers\Controller;
 use DB;
-use ReflectionClass;
 
 /**
  * ModelGenerator.

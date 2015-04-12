@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Model;
+<?php namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
  * Relations, manages all relations of one table
@@ -7,7 +7,6 @@
  * Date: 5-4-2015
  * Time: 05:40
  */
-
 class Relations {
 
     // input

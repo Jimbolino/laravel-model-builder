@@ -1,11 +1,11 @@
-<?php namespace App\Http\Controllers\Model;
+<?php namespace Jimbolino\Laravel\ModelBuilder;
+
 /**
  * Created by PhpStorm.
  * User: Jim
  * Date: 4-4-2015
  * Time: 23:13
  */
-
 class StringUtils {
 
     /**
@@ -38,6 +38,7 @@ class StringUtils {
         return self::dashesToCamelCase($table,true);
     }
 
+    // http://stackoverflow.com/a/2792045
     public static function underscoresToCamelCase($string, $capitalizeFirstCharacter = false) {
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
         if (!$capitalizeFirstCharacter) {

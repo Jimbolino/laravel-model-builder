@@ -1,8 +1,4 @@
-<?php namespace App\Http\Controllers\Model;
-
-use Illuminate\Support\Facades\DB;
-use ReflectionClass;
-use Exception;
+<?php namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
  * ModelGenerator5.

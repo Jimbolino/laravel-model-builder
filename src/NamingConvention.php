@@ -1,4 +1,5 @@
-<?php namespace App\Http\Controllers\Model;
+<?php namespace Jimbolino\Laravel\ModelBuilder;
+
 /**
  * Class NamingConvention
  * based on http://laravel.com/docs/5.0/eloquent#basic-usage

@@ -1,4 +1,4 @@
-<?php namespace App\Http\Controllers\Model;
+<?php namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
  * Relation, defines one single Relation entry
