@@ -1,7 +1,7 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
-use App\Http\Controllers\Controller;
 use DB;
+use Illuminate\Routing\Controller;
 
 /**
  * ModelGenerator.
@@ -30,7 +30,7 @@ class ModelGenerator extends Controller {
      * @var int
      */
     public static $lineWrap = 120;
-
+    private $namespace;
 
     public function __construct() {
 
@@ -43,6 +43,8 @@ class ModelGenerator extends Controller {
 
         // This is the path where we will store your new models
         $this->path = '../app/storage/models'; // should be overwritten later
+
+        $this->namespace = 'Dialtelecom\DomainEloquent';
     }
 
     public function start() {
@@ -67,7 +69,7 @@ class ModelGenerator extends Controller {
 
         foreach($this->tables as $table) {
             $model = new Model();
-            $model->buildModel($table, $this->baseModel, $this->describes, $this->foreignKeys);
+            $model->buildModel($table, $this->baseModel, $this->describes, $this->foreignKeys, $this->namespace);
 
             $model->createModel();
 

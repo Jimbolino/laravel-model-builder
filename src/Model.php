@@ -27,6 +27,7 @@ class Model {
     private $hidden = array();
     private $fillable = array();
     private $relations = array();
+    private $namespace;
 
     // the result
     private $fileContents = '';
@@ -38,12 +39,13 @@ class Model {
      * @param $describes
      * @param $foreignKeys
      */
-    public function buildModel($table, $baseModel, $describes, $foreignKeys) {
+    public function buildModel($table, $baseModel, $describes, $foreignKeys, $namespace = '') {
         $this->table = $table;
         $this->baseModel = $baseModel;
         $this->describes = $describes;
         $this->foreignKeys = $this->filterAndSeparateForeignKeys($foreignKeys['all'], $table);
         $this->foreignKeysByTable = $foreignKeys['ordered'];
+        $this->namespace = $namespace;
 
         $this->class = StringUtils::prettifyTableName($table);
         $this->timestampFields = $this->getTimestampFields($this->baseModel);
@@ -92,7 +94,9 @@ class Model {
      */
     public function createModel() {
 
-        $file = '<?php'.LF;
+        // hhj:
+        $namespace = empty($this->namespace) ? '' : ' namespace ' . $this->namespace . ';';
+        $file = '<?php'.$namespace.LF;
 
         $file .= '/**'.LF;
         $file .= ' * Eloquent class to describe the '.$this->table.' table'.LF;

@@ -15,10 +15,10 @@ class ModelGenerator5 extends ModelGenerator {
         parent::__construct();
 
         // This is the model that all your others will extend
-        $this->baseModel = 'Illuminate\Database\Eloquent\Model'; // default laravel 5
+        $this->baseModel = '\Illuminate\Database\Eloquent\Model'; // default laravel 5
 
         // This is the path where we will store your new models
-        $this->path = '../storage/models'; // laravel 5
+        $this->path = base_path('storage/models'); // laravel 5
 
     }
 
