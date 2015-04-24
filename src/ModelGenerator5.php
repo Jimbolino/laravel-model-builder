@@ -21,7 +21,7 @@ class ModelGenerator5 extends Controller {
         $path = base_path('storage/models'); // laravel 5
 
         // The namespace of the models
-        $namespace = '';
+        $namespace = 'App'; // default namespace for clean laravel 5 installation
 
         $generator = new ModelGenerator($baseModel, $path, $namespace);
         $generator->start();
