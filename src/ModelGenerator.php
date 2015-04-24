@@ -1,7 +1,6 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
 use DB;
-use Illuminate\Routing\Controller;
 
 /**
  * ModelGenerator.
@@ -14,7 +13,7 @@ use Illuminate\Routing\Controller;
  * @since 02-2015
  *
  */
-class ModelGenerator extends Controller {
+class ModelGenerator {
 
     protected $foreignKeys = array();
 
@@ -30,21 +29,27 @@ class ModelGenerator extends Controller {
      * @var int
      */
     public static $lineWrap = 120;
-    private $namespace;
 
-    public function __construct() {
+    protected $namespace = 'app';
+
+    protected $path = '';
+
+    protected $baseModel = 'Eloquent';
+
+    /**
+     * @param string $baseModel (the model that all your others will extend)
+     * @param string $path (the path where we will store your new models)
+     * @param string $namespace (the namespace of the models)
+     */
+    public function __construct($baseModel = '', $path = '', $namespace = '') {
 
         if (!defined('TAB')) define('TAB', "    "); // Code MUST use 4 spaces for indenting, not tabs.
         if (!defined('LF')) define('LF', "\n");
         if (!defined('CR')) define('CR', "\r");
 
-        // This is the model that all your others will extend
-        $this->baseModel = 'Model'; // should be overwritten later
-
-        // This is the path where we will store your new models
-        $this->path = '../app/storage/models'; // should be overwritten later
-
-        $this->namespace = 'Dialtelecom\DomainEloquent';
+        $this->baseModel = $baseModel;
+        $this->path = $path;
+        $this->namespace = $namespace;
     }
 
     public function start() {
@@ -101,27 +106,31 @@ class ModelGenerator extends Controller {
         if($count == 2) return true;
     }
 
+    /**
+     * Write the actual TableName.php file
+     * @param $table
+     * @param $model
+     * @return array
+     * @throws Exception
+     */
     protected function writeFile($table, $model) {
         $filename = StringUtils::prettifyTableName($table).'.php';
 
-        $path = realpath($_SERVER['DOCUMENT_ROOT']).'/'.$this->path.'/';
-        if(!is_dir($path)) {
+        if(!is_dir($this->path)) {
             $oldumask = umask(0);
-            echo 'creating path: '.$path.LF;
-            mkdir($path, 0777, true);
+            echo 'creating path: '.$this->path.LF;
+            mkdir($this->path, 0777, true);
             umask($oldumask);
-            if(!is_dir($path)) throw new Exception('dir '. $path .' could not be created');
+            if(!is_dir($this->path)) throw new Exception('dir '. $this->path .' could not be created');
         }
-        $result = file_put_contents($path.$filename, $model);
-        return array('filename' => $path.$filename, 'result' => $result);
+        $result = file_put_contents($this->path.'/'.$filename, $model);
+        return array('filename' => $this->path.'/'.$filename, 'result' => $result);
     }
-
-
-
 
     /**
      * Parse int(10) unsigned to something useful
      * @param string $type
+     * @return array
      */
     protected function parseType($type) {
         $result = array();
@@ -227,8 +236,6 @@ class ModelGenerator extends Controller {
             if($entry->COLUMN_NAME == $field && $entry->TABLE_NAME == $table) return true;
         }
     }
-
-
 
 
 }

@@ -1,5 +1,7 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
+use Illuminate\Routing\Controller;
+
 /**
  * ModelGenerator5.
  *
@@ -9,16 +11,20 @@
  * @since 02-2015
  *
  */
-class ModelGenerator5 extends ModelGenerator {
+class ModelGenerator5 extends Controller {
 
-    public function __construct() {
-        parent::__construct();
-
+    public function start() {
         // This is the model that all your others will extend
-        $this->baseModel = '\Illuminate\Database\Eloquent\Model'; // default laravel 5
+        $baseModel = '\Illuminate\Database\Eloquent\Model'; // default laravel 5
 
         // This is the path where we will store your new models
-        $this->path = base_path('storage/models'); // laravel 5
+        $path = base_path('storage/models'); // laravel 5
+
+        // The namespace of the models
+        $namespace = '';
+
+        $generator = new ModelGenerator($baseModel, $path, $namespace);
+        $generator->start();
 
     }
 

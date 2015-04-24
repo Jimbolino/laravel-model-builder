@@ -1,5 +1,7 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
+use Illuminate\Routing\Controller;
+
 /**
  * ModelGenerator4.
  *
@@ -9,17 +11,20 @@
  * @since 02-2015
  *
  */
-class ModelGenerator4 extends ModelGenerator {
+class ModelGenerator4 extends Controller {
 
-    public function __construct() {
-        parent::__construct();
-
+    public function start() {
         // This is the model that all your others will extend
-//        $this->baseModel = 'BaseModel'; // custom
-        $this->baseModel = 'Model'; // default laravel 4
+        $baseModel = 'Eloquent'; // default laravel 4.2
 
         // This is the path where we will store your new models
-        $this->path = '../app/storage/models'; // laravel 4
+        $path = base_path('app/storage/models'); // laravel 4
+
+        // The namespace of the models
+        $namespace = ''; // by default laravel 4 doesn't use namespaces
+
+        $generator = new ModelGenerator($baseModel, $path, $namespace);
+        $generator->start();
 
     }
 

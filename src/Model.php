@@ -27,7 +27,7 @@ class Model {
     private $hidden = array();
     private $fillable = array();
     private $relations = array();
-    private $namespace;
+    private $namespace = '';
 
     // the result
     private $fileContents = '';
@@ -38,6 +38,7 @@ class Model {
      * @param $baseModel
      * @param $describes
      * @param $foreignKeys
+     * @param string $namespace
      */
     public function buildModel($table, $baseModel, $describes, $foreignKeys, $namespace = '') {
         $this->table = $table;
@@ -45,7 +46,10 @@ class Model {
         $this->describes = $describes;
         $this->foreignKeys = $this->filterAndSeparateForeignKeys($foreignKeys['all'], $table);
         $this->foreignKeysByTable = $foreignKeys['ordered'];
-        $this->namespace = $namespace;
+
+        if(!empty($namespace)) {
+            $this->namespace = ' namespace '.$namespace.';';
+        }
 
         $this->class = StringUtils::prettifyTableName($table);
         $this->timestampFields = $this->getTimestampFields($this->baseModel);
@@ -89,14 +93,10 @@ class Model {
 
     /**
      * Secondly, create the model
-     * @param $describe
-     * @param $table
      */
     public function createModel() {
 
-        // hhj:
-        $namespace = empty($this->namespace) ? '' : ' namespace ' . $this->namespace . ';';
-        $file = '<?php'.$namespace.LF;
+        $file = '<?php'.$this->namespace.LF;
 
         $file .= '/**'.LF;
         $file .= ' * Eloquent class to describe the '.$this->table.' table'.LF;
@@ -105,9 +105,10 @@ class Model {
         //$file .= ' * on: '.date(DATE_ISO8601);
         $file .= ' */'.LF.LF;
 
-
+        // start a new class that extends the baseModel
         $file .= 'class '.$this->class.' extends '.$this->baseModel.' {'.LF.LF;
 
+        // the name of the mysql table
         $file .= TAB.'protected $table = '.StringUtils::singleQuote($this->table).';'.LF.LF;
 
         // primarykey defaults to "id"
@@ -125,15 +126,18 @@ class Model {
             $file .= TAB.'public $incrementing = '.var_export($this->incrementing, true).';'.LF.LF;
         }
 
+        // all date fields
         if(!empty($this->dates)) {
             $file .= TAB.'public function getDates() {'.LF;
             $file .= TAB.TAB.'return array('.StringUtils::implodeAndQuote(', ',$this->dates).');'.LF;
             $file .= TAB.'}'.LF.LF;
         }
 
+        // most fields are considered as fillable
         $wrap = TAB.'protected $fillable = array('.StringUtils::implodeAndQuote(', ', $this->fillable ).');'.LF.LF;
         $file .= wordwrap($wrap, ModelGenerator::$lineWrap, LF.TAB.TAB);
 
+        // except for the hidden ones
         if(!empty($this->hidden)) {
             $file .= TAB.'protected $hidden = array('.StringUtils::implodeAndQuote(', ', $this->hidden).');'.LF.LF;
         }
@@ -141,9 +145,7 @@ class Model {
         // add all relations
         $file .= $this->relations;
 
-
-        //$file .= TAB.'';
-
+        // close the class
         $file .= '}'.LF.LF;
 
         $this->fileContents = $file;
