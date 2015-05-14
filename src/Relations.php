@@ -14,6 +14,7 @@ class Relations {
     private $foreignKeys = array();
     private $describes = array();
     private $foreignKeysByTable = array();
+    private $prefix = '';
 
     // temporary
     private $manyToMany = array();
@@ -21,44 +22,40 @@ class Relations {
     // result
     private $relations = array();
 
-
     /**
      * This is where the magic happens
      * @param $localTable
      * @param $foreignKeys
      * @param $describes
      */
-    public function __construct($localTable, $foreignKeys, $describes, $foreignKeysByTable) {
+    public function __construct($localTable, $foreignKeys, $describes, $foreignKeysByTable, $prefix) {
         // save
         $this->localTable = $localTable;
         $this->foreignKeys = $foreignKeys;
         $this->describes = $describes;
         $this->foreignKeysByTable = $foreignKeysByTable;
+        $this->prefix = $prefix;
 
         // do local keys
         foreach($foreignKeys['local'] as $foreignKey) {
-            $remoteFunction = StringUtils::underscoresToCamelCase($foreignKey->REFERENCED_TABLE_NAME);
             $type = $this->findType($foreignKey,false);
-            $remoteClass = StringUtils::prettifyTableName($foreignKey->REFERENCED_TABLE_NAME);
             $remoteField = $foreignKey->REFERENCED_COLUMN_NAME;
             $remoteTable = $foreignKey->REFERENCED_TABLE_NAME;
             $localField = $foreignKey->COLUMN_NAME;
-            $this->relations[] = new Relation($remoteFunction, $type, $remoteClass, $remoteField, $remoteTable, $localField);
+            $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix);
         }
 
         // do remote keys
         foreach($foreignKeys['remote'] as $foreignKey) {
-            $remoteFunction = StringUtils::underscoresToCamelCase($foreignKey->TABLE_NAME);
             $type = $this->findType($foreignKey,true);
             if($type == 'belongsToMany') {
                 $this->manyToMany[] = $foreignKey;
                 continue;
             }
-            $remoteClass = StringUtils::prettifyTableName($foreignKey->TABLE_NAME);
             $remoteField = $foreignKey->COLUMN_NAME;
             $remoteTable = $foreignKey->TABLE_NAME;
             $localField = $foreignKey->REFERENCED_COLUMN_NAME;
-            $this->relations[] = new Relation($remoteFunction, $type, $remoteClass, $remoteField, $remoteTable, $localField);
+            $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix);
         }
 
         // many to many last
@@ -80,11 +77,9 @@ class Relations {
                     }
                 }
             }
-            $remoteFunction = StringUtils::underscoresToCamelCase($remoteTable).'s';
             $type = $this->findType($foreignKey,true);
-            $remoteClass = StringUtils::prettifyTableName($remoteTable);
             $junctionTable = $foreignKey->TABLE_NAME;
-            $this->relations[] = new Relation($remoteFunction, $type, $remoteClass, $remoteField, $remoteTable, $localField, $junctionTable);
+            $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix, $junctionTable);
         }
 
     }

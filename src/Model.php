@@ -28,6 +28,7 @@ class Model {
     private $fillable = array();
     private $relations = array();
     private $namespace = '';
+    private $prefix = '';
 
     // the result
     private $fileContents = '';
@@ -39,9 +40,10 @@ class Model {
      * @param $describes
      * @param $foreignKeys
      * @param string $namespace
+     * @param string $prefix
      */
-    public function buildModel($table, $baseModel, $describes, $foreignKeys, $namespace = '') {
-        $this->table = $table;
+    public function buildModel($table, $baseModel, $describes, $foreignKeys, $namespace = '', $prefix = '') {
+        $this->table = StringUtils::removePrefix($table,$prefix);
         $this->baseModel = $baseModel;
         $this->describes = $describes;
         $this->foreignKeys = $this->filterAndSeparateForeignKeys($foreignKeys['all'], $table);
@@ -50,8 +52,9 @@ class Model {
         if(!empty($namespace)) {
             $this->namespace = ' namespace '.$namespace.';';
         }
+        $this->prefix = $prefix;
 
-        $this->class = StringUtils::prettifyTableName($table);
+        $this->class = StringUtils::prettifyTableName($table, $prefix);
         $this->timestampFields = $this->getTimestampFields($this->baseModel);
 
         $describe = $this->describes[$table];
@@ -87,7 +90,7 @@ class Model {
         }
 
         // relations
-        $this->relations = new Relations($table, $this->foreignKeys, $this->describes, $this->foreignKeysByTable);
+        $this->relations = new Relations($table, $this->foreignKeys, $this->describes, $this->foreignKeysByTable, $prefix);
 
     }
 

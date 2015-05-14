@@ -40,8 +40,9 @@ class ModelGenerator {
      * @param string $baseModel (the model that all your others will extend)
      * @param string $path (the path where we will store your new models)
      * @param string $namespace (the namespace of the models)
+     * @param string $prefix (the configured table prefix)
      */
-    public function __construct($baseModel = '', $path = '', $namespace = '') {
+    public function __construct($baseModel = '', $path = '', $namespace = '', $prefix = '') {
 
         if (!defined('TAB')) define('TAB', "    "); // Code MUST use 4 spaces for indenting, not tabs.
         if (!defined('LF')) define('LF', "\n");
@@ -50,6 +51,7 @@ class ModelGenerator {
         $this->baseModel = $baseModel;
         $this->path = $path;
         $this->namespace = $namespace;
+        $this->prefix = $prefix;
     }
 
     public function start() {
@@ -74,7 +76,7 @@ class ModelGenerator {
 
         foreach($this->tables as $table) {
             $model = new Model();
-            $model->buildModel($table, $this->baseModel, $this->describes, $this->foreignKeys, $this->namespace);
+            $model->buildModel($table, $this->baseModel, $this->describes, $this->foreignKeys, $this->namespace, $this->prefix);
 
             $model->createModel();
 
@@ -114,7 +116,7 @@ class ModelGenerator {
      * @throws Exception
      */
     protected function writeFile($table, $model) {
-        $filename = StringUtils::prettifyTableName($table).'.php';
+        $filename = StringUtils::prettifyTableName($table, $this->prefix).'.php';
 
         if(!is_dir($this->path)) {
             $oldumask = umask(0);
@@ -162,10 +164,16 @@ class ModelGenerator {
         $tables = array();
         $views = array();
         foreach($results as $result) {
+            // get the first element (table name)
             foreach($result as $value) {
                 $first = $value;
                 break;
             }
+
+            // skip all tables that are not the current prefix
+            if(!$this->isPrefix($first)) continue;
+
+            // separate views from tables
             if($result->Table_type == 'VIEW') {
                 $views[] = $first;
             }
@@ -235,6 +243,16 @@ class ModelGenerator {
         foreach($this->foreignKeys['all'] as $entry) {
             if($entry->COLUMN_NAME == $field && $entry->TABLE_NAME == $table) return true;
         }
+    }
+
+    /**
+     * Check if the given name starts with the current prefix
+     * @param $name
+     * @return bool
+     */
+    protected function isPrefix($name) {
+        if(empty($this->prefix)) return true;
+	return starts_with($name, $this->prefix);
     }
 
 

@@ -21,17 +21,15 @@ class StringUtils {
     /**
      * Convert a mysql table name to a class name, optionally removing a prefix.
      * @param $table
-     * @param bool $removePrefix
+     * @param string $prefix
      * @return mixed
      */
-    public static function prettifyTableName($table, $removePrefix = false) {
-        $tableParts = explode('_',$table);
-
-        if($removePrefix) {
-            if(strlen($tableParts[0]) < 3) {
-                unset($tableParts[0]);
-            }
+    public static function prettifyTableName($table, $prefix = '') {
+        if($prefix) {
+            $table = self::removePrefix($table,$prefix);
         }
+
+        $tableParts = explode('_',$table);
 
         $table = implode('-',$tableParts);
 
@@ -86,6 +84,30 @@ class StringUtils {
         unset($piece);
 
         return implode($glue,$pieces);
+    }
+
+    /**
+     * Remove a prefix from a table name
+     * @param $table
+     * @param $prefix
+     * @return string
+     */
+    public static function removePrefix($table, $prefix) {
+        return substr($table,strlen($prefix));
+    }
+
+    /**
+     * Use laravel pluralization, and if that one fails give a warning and just append "s"
+     * @param $value
+     * @return string
+     */
+    public static function safePlural($value) {
+        $plural = str_plural($value);
+        if($plural == $value) {
+            $plural = $value.'s';
+            echo 'warning: automatic pluralization of '.$value.' failed, using '.$plural.LF;
+        }
+        return $plural;
     }
 
 }

@@ -9,22 +9,24 @@
  */
 class Relation {
 
-    protected $remoteFunction;
     protected $type;
-    protected $remoteClass;
     protected $remoteField;
-    protected $remoteTable;
     protected $localField;
+    protected $remoteFunction;
+    protected $remoteClass;
     protected $junctionTable;
 
-    public function __construct($remoteFunction, $type, $remoteClass, $remoteField, $remoteTable, $localField, $junctionTable = '') {
-        $this->remoteFunction = $remoteFunction;
+    public function __construct($type, $remoteField, $remoteTable, $localField, $prefix = '', $junctionTable = '') {
         $this->type = $type;
-        $this->remoteClass = $remoteClass;
         $this->remoteField = $remoteField;
-        $this->remoteTable = $remoteTable;
         $this->localField = $localField;
-        $this->junctionTable = $junctionTable;
+        $this->remoteFunction = StringUtils::underscoresToCamelCase(StringUtils::removePrefix($remoteTable,$prefix));
+        $this->remoteClass = StringUtils::prettifyTableName($remoteTable,$prefix);
+        $this->junctionTable = StringUtils::removePrefix($junctionTable,$prefix);
+
+        if($this->type == 'belongsToMany') {
+            $this->remoteFunction = StringUtils::safePlural($this->remoteFunction);
+        }
     }
 
     public function __toString() {
