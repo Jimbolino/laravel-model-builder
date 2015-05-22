@@ -1,9 +1,9 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
-use DB;
+use Exception;
 
 /**
- * ModelGenerator.
+ * Class ModelGenerator
  *
  * This is a basic class that analyzes your current database with SHOW TABLES and DESCRIBE.
  * The result will be written in Laravel Model files.
@@ -11,9 +11,10 @@ use DB;
  *
  * @author Jimbolino
  * @since 02-2015
- *
+ * @package Jimbolino\Laravel\ModelBuilder
  */
-class ModelGenerator {
+class ModelGenerator
+{
 
     protected $foreignKeys = array();
 
@@ -22,6 +23,8 @@ class ModelGenerator {
     protected $tables = array();
 
     protected $views = array();
+
+    protected $describes = array();
 
     /**
      * There MUST NOT be a hard limit on line length; the soft limit MUST be 120 characters;
@@ -42,11 +45,18 @@ class ModelGenerator {
      * @param string $namespace (the namespace of the models)
      * @param string $prefix (the configured table prefix)
      */
-    public function __construct($baseModel = '', $path = '', $namespace = '', $prefix = '') {
+    public function __construct($baseModel = '', $path = '', $namespace = '', $prefix = '')
+    {
 
-        if (!defined('TAB')) define('TAB', "    "); // Code MUST use 4 spaces for indenting, not tabs.
-        if (!defined('LF')) define('LF', "\n");
-        if (!defined('CR')) define('CR', "\r");
+        if (!defined('TAB')) {
+            define('TAB', '    '); // Code MUST use 4 spaces for indenting, not tabs.
+        }
+        if (!defined('LF')) {
+            define('LF', "\n");
+        }
+        if (!defined('CR')) {
+            define('CR', "\r");
+        }
 
         $this->baseModel = $baseModel;
         $this->path = $path;
@@ -54,19 +64,24 @@ class ModelGenerator {
         $this->prefix = $prefix;
     }
 
-    public function start() {
+    /**
+     * This is where we start
+     * @throws Exception
+     */
+    public function start()
+    {
         echo '<pre>';
-        $tablesAndViews = $this->showTables();
+        $tablesAndViews = Database::showTables($this->prefix);
         $this->tables = $tablesAndViews['tables'];
         $this->views = $tablesAndViews['views'];
 
-        $this->foreignKeys['all'] = $this->getAllForeignKeys();
+        $this->foreignKeys['all'] = Database::getAllForeignKeys();
         $this->foreignKeys['ordered'] = $this->getAllForeignKeysOrderedByTable();
 
-        foreach($this->tables as $key => $table) {
-            $this->describes[$table] = $this->describeTable($table);
+        foreach ($this->tables as $key => $table) {
+            $this->describes[$table] = Database::describeTable($table);
 
-            if($this->isManyToMany($table, true)) {
+            if ($this->isManyToMany($table, true)) {
                 $this->junctionTables[] = $table;
                 unset($this->tables[$key]);
             }
@@ -74,9 +89,16 @@ class ModelGenerator {
         unset($table);
 
 
-        foreach($this->tables as $table) {
+        foreach ($this->tables as $table) {
             $model = new Model();
-            $model->buildModel($table, $this->baseModel, $this->describes, $this->foreignKeys, $this->namespace, $this->prefix);
+            $model->buildModel(
+                $table,
+                $this->baseModel,
+                $this->describes,
+                $this->foreignKeys,
+                $this->namespace,
+                $this->prefix
+            );
 
             $model->createModel();
 
@@ -87,25 +109,35 @@ class ModelGenerator {
         echo 'done';
     }
 
-    protected function isManyToMany($table, $checkForeignKey = true) {
-        $describe = $this->describeTable($table);
+    /**
+     * Detect many to many tables
+     * @param $table
+     * @param bool $checkForeignKey
+     * @return bool
+     */
+    protected function isManyToMany($table, $checkForeignKey = true)
+    {
+        $describe = Database::describeTable($table);
 
         $count = 0;
-        foreach($describe as $field) {
-            if(count($describe) < 3) {
+        foreach ($describe as $field) {
+            if (count($describe) < 3) {
                 $type = $this->parseType($field->Type);
-                if($type['type']=='int' && $field->Key == 'PRI') {
+                if ($type['type']=='int' && $field->Key == 'PRI') {
                     // should be a foreign key
-                    if($checkForeignKey && $this->isForeignKey($table, $field->Field)) {
+                    if ($checkForeignKey && $this->isForeignKey($table, $field->Field)) {
                         $count++;
                     }
-                    if(!$checkForeignKey) {
+                    if (!$checkForeignKey) {
                         $count++;
                     }
                 }
             }
         }
-        if($count == 2) return true;
+        if ($count == 2) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -115,15 +147,18 @@ class ModelGenerator {
      * @return array
      * @throws Exception
      */
-    protected function writeFile($table, $model) {
+    protected function writeFile($table, $model)
+    {
         $filename = StringUtils::prettifyTableName($table, $this->prefix).'.php';
 
-        if(!is_dir($this->path)) {
-            $oldumask = umask(0);
+        if (!is_dir($this->path)) {
+            $oldUMask = umask(0);
             echo 'creating path: '.$this->path.LF;
             mkdir($this->path, 0777, true);
-            umask($oldumask);
-            if(!is_dir($this->path)) throw new Exception('dir '. $this->path .' could not be created');
+            umask($oldUMask);
+            if (!is_dir($this->path)) {
+                throw new Exception('dir '. $this->path .' could not be created');
+            }
         }
         $result = file_put_contents($this->path.'/'.$filename, $model);
         return array('filename' => $this->path.'/'.$filename, 'result' => $result);
@@ -134,102 +169,38 @@ class ModelGenerator {
      * @param string $type
      * @return array
      */
-    protected function parseType($type) {
+    protected function parseType($type)
+    {
         $result = array();
 
         // get unsigned
         $result['unsigned'] = false;
-        $type = explode(' ',$type);
+        $type = explode(' ', $type);
 
-        if(isset($type[1]) && $type[1] === 'unsigned') {
+        if (isset($type[1]) && $type[1] === 'unsigned') {
             $result['unsigned'] = true;
         }
 
         // int(11) + varchar(255) = $type = varchar, $size = 255
         $type = explode('(', $type[0]);
         $result['type'] = $type[0];
-        if(isset($type[1])) {
+        if (isset($type[1])) {
             $result['size'] = intval($type[1]);
         }
 
         return $result;
     }
 
-    /**
-     * Execute a SHOW TABLES query
-     * @return array with 'tables' and 'views'
-     */
-    protected function showTables() {
-        $results = DB::select('SHOW FULL TABLES');
-        $tables = array();
-        $views = array();
-        foreach($results as $result) {
-            // get the first element (table name)
-            foreach($result as $value) {
-                $first = $value;
-                break;
-            }
 
-            // skip all tables that are not the current prefix
-            if(!$this->isPrefix($first)) continue;
-
-            // separate views from tables
-            if($result->Table_type == 'VIEW') {
-                $views[] = $first;
-            }
-            else {
-                $tables[] = $first;
-            }
-        }
-        return array('tables' => $tables, 'views' => $views);
-    }
-
-
-    /**
-     * Execute a describe table query
-     * @param $table
-     * @return mixed
-     */
-    protected function describeTable($table) {
-        $result = DB::select('SHOW FULL COLUMNS FROM '.$table);
-        $result = $this->indexArrayByValue($result, 'Field');
-        return $result;
-    }
-
-    protected function indexArrayByValue($input, $value) {
-        $output = array();
-        foreach($input as $row) {
-            $output[$row->$value] = $row;
-        }
-        return $output;
-    }
-
-    protected function orderArrayByValue($input, $value) {
-        $output = array();
-        foreach($input as $row) {
-            $output[$row->$value][] = $row;
-        }
-        return $output;
-    }
-
-    /**
-     * Return a sql result with all foreign keys (data from information_scheme)
-     * @return mixed
-     */
-    protected function getAllForeignKeys() {
-        $sql = 'SELECT * FROM information_schema.KEY_COLUMN_USAGE ';
-        $sql .= 'WHERE REFERENCED_COLUMN_NAME IS NOT NULL AND REFERENCED_TABLE_SCHEMA = DATABASE()';
-        $results = DB::select($sql);
-        return $results;
-    }
 
     /**
      * Return an array with tables, with arrays of foreign keys
      * @return array|mixed
      */
-    protected function getAllForeignKeysOrderedByTable() {
-        $results = $this->getAllForeignKeys();
-        $results = $this->orderArrayByValue($results, 'TABLE_NAME');
+    protected function getAllForeignKeysOrderedByTable()
+    {
+        $results = Database::getAllForeignKeys();
+        $results = ArrayHelpers::orderArrayByValue($results, 'TABLE_NAME');
         return $results;
     }
 
@@ -239,10 +210,14 @@ class ModelGenerator {
      * @param $field
      * @return bool
      */
-    protected function isForeignKey($table, $field) {
-        foreach($this->foreignKeys['all'] as $entry) {
-            if($entry->COLUMN_NAME == $field && $entry->TABLE_NAME == $table) return true;
+    protected function isForeignKey($table, $field)
+    {
+        foreach ($this->foreignKeys['all'] as $entry) {
+            if ($entry->COLUMN_NAME == $field && $entry->TABLE_NAME == $table) {
+                return true;
+            }
         }
+        return false;
     }
 
     /**
@@ -250,10 +225,11 @@ class ModelGenerator {
      * @param $name
      * @return bool
      */
-    protected function isPrefix($name) {
-        if(empty($this->prefix)) return true;
-	return starts_with($name, $this->prefix);
+    protected function isPrefix($name)
+    {
+        if (empty($this->prefix)) {
+            return true;
+        }
+        return starts_with($name, $this->prefix);
     }
-
-
 }

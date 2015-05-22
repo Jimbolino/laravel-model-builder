@@ -1,20 +1,16 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\DB;
 
 /**
- * ModelGenerator4.
- *
- * Laravel 4 version for the ModelGenerator
- *
- * @author Jimbolino
- * @since 02-2015
- *
+ * Class ModelGenerator4, Laravel 4 version for the ModelGenerator
+ * @package Jimbolino\Laravel\ModelBuilder
  */
-class ModelGenerator4 extends Controller {
+class ModelGenerator4 extends Controller
+{
 
-    public function start() {
+    public function start()
+    {
         // This is the model that all your others will extend
         $baseModel = 'Eloquent'; // default laravel 4.2
 
@@ -25,11 +21,10 @@ class ModelGenerator4 extends Controller {
         $namespace = ''; // by default laravel 4 doesn't use namespaces
 
         // get the prefix from the config
-        $prefix = DB::getTablePrefix();
+        $prefix = Database::getTablePrefix();
 
         $generator = new ModelGenerator($baseModel, $path, $namespace, $prefix);
         $generator->start();
 
     }
-
 }

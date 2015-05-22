@@ -1,13 +1,11 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
- * Relations, manages all relations of one table
- *
- * User: Jim
- * Date: 5-4-2015
- * Time: 05:40
+ * Class Relations, manages all relations of one model
+ * @package Jimbolino\Laravel\ModelBuilder
  */
-class Relations {
+class Relations
+{
 
     // input
     private $localTable = '';
@@ -19,7 +17,9 @@ class Relations {
     // temporary
     private $manyToMany = array();
 
-    // result
+    /**
+     * @var Relation[]
+     */
     private $relations = array();
 
     /**
@@ -28,7 +28,8 @@ class Relations {
      * @param $foreignKeys
      * @param $describes
      */
-    public function __construct($localTable, $foreignKeys, $describes, $foreignKeysByTable, $prefix) {
+    public function __construct($localTable, $foreignKeys, $describes, $foreignKeysByTable, $prefix)
+    {
         // save
         $this->localTable = $localTable;
         $this->foreignKeys = $foreignKeys;
@@ -36,9 +37,13 @@ class Relations {
         $this->foreignKeysByTable = $foreignKeysByTable;
         $this->prefix = $prefix;
 
+        $remoteField = '';
+        $remoteTable = '';
+        $localField = '';
+
         // do local keys
-        foreach($foreignKeys['local'] as $foreignKey) {
-            $type = $this->findType($foreignKey,false);
+        foreach ($foreignKeys['local'] as $foreignKey) {
+            $type = $this->findType($foreignKey, false);
             $remoteField = $foreignKey->REFERENCED_COLUMN_NAME;
             $remoteTable = $foreignKey->REFERENCED_TABLE_NAME;
             $localField = $foreignKey->COLUMN_NAME;
@@ -46,9 +51,9 @@ class Relations {
         }
 
         // do remote keys
-        foreach($foreignKeys['remote'] as $foreignKey) {
-            $type = $this->findType($foreignKey,true);
-            if($type == 'belongsToMany') {
+        foreach ($foreignKeys['remote'] as $foreignKey) {
+            $type = $this->findType($foreignKey, true);
+            if ($type == 'belongsToMany') {
                 $this->manyToMany[] = $foreignKey;
                 continue;
             }
@@ -59,25 +64,24 @@ class Relations {
         }
 
         // many to many last
-        foreach($this->manyToMany as $foreignKey) {
+        foreach ($this->manyToMany as $foreignKey) {
             $fields = $this->describes[$foreignKey->TABLE_NAME];
             $relations = $this->foreignKeysByTable[$foreignKey->TABLE_NAME];
-            foreach($fields as $field) {
-                if($field->Key == 'PRI') {
-                    if($field->Field == $foreignKey->COLUMN_NAME) {
+            foreach ($fields as $field) {
+                if ($field->Key == 'PRI') {
+                    if ($field->Field == $foreignKey->COLUMN_NAME) {
                         $localField = $field->Field;
-                    }
-                    else {
+                    } else {
                         $remoteField = $field->Field;
-                        foreach($relations as $relation) {
-                            if($relation->REFERENCED_TABLE_NAME !== $this->localTable) {
+                        foreach ($relations as $relation) {
+                            if ($relation->REFERENCED_TABLE_NAME !== $this->localTable) {
                                 $remoteTable = $relation->REFERENCED_TABLE_NAME;
                             }
                         }
                     }
                 }
             }
-            $type = $this->findType($foreignKey,true);
+            $type = $this->findType($foreignKey, true);
             $junctionTable = $foreignKey->TABLE_NAME;
             $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix, $junctionTable);
         }
@@ -90,59 +94,58 @@ class Relations {
      * @param $remote
      * @return string
      */
-    protected function findType($foreignKey,$remote) {
-        if($remote) {
-            if($this->isBelongsToMany($foreignKey)) {
+    protected function findType($foreignKey, $remote)
+    {
+        if ($remote) {
+            if ($this->isBelongsToMany($foreignKey)) {
                 return 'belongsToMany';
             }
-            if($this->isHasOne($foreignKey)) {
+            if ($this->isHasOne($foreignKey)) {
                 return 'hasOne';
             }
-            if($this->isHasMany($foreignKey)) {
-                return 'hasMany';
-            }
-        }
-        else {
-            if($this->isBelongsTo($foreignKey)) {
-                return 'belongsTo';
-            }
+            return 'hasMany';
+
+        } else {
+            return 'belongsTo';
         }
     }
 
-    // One to one: The relationship is from a primary key to another primary key
-    protected function isHasOne($foreignKey) {
+    /**
+     * One to one: The relationship is from a primary key to another primary key
+     * @param $foreignKey
+     * @return bool
+     */
+    protected function isHasOne($foreignKey)
+    {
         $remote = $this->describes[$foreignKey->TABLE_NAME];
-        foreach($remote as $field) {
-            if($field->Key == 'PRI') {
-                if($field->Field == $foreignKey->COLUMN_NAME) {
+        foreach ($remote as $field) {
+            if ($field->Key == 'PRI') {
+                if ($field->Field == $foreignKey->COLUMN_NAME) {
                     return true;
                 }
             }
         }
+        return false;
     }
 
-    // One to many: The rest
-    protected function isHasMany($foreignKey) {
-        return true;
-    }
-
-    // One to one: The relationship is from a primary key to another primary key
-    protected function isBelongsTo($foreignKey) {
-        return true;
-    }
-
-    // Many to many
-    protected function isBelongsToMany($foreignKey) {
+    /**
+     * Many to many
+     * @param $foreignKey
+     * @return bool
+     */
+    protected function isBelongsToMany($foreignKey)
+    {
         $remote = $this->describes[$foreignKey->TABLE_NAME];
         $count = 0;
-        foreach($remote as $field) {
-            if($field->Key == 'PRI') {
+        foreach ($remote as $field) {
+            if ($field->Key == 'PRI') {
                 $count++;
             }
         }
-        if($count == 2)  {
+        if ($count == 2) {
             return true;
         }
+        return false;
     }
 
 
@@ -150,14 +153,12 @@ class Relations {
      * Outputs all relations to a string
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         $res = '';
-        foreach($this->relations as $relation) {
+        foreach ($this->relations as $relation) {
             $res .= $relation->__toString();
         }
         return $res;
     }
-
-
-
 }

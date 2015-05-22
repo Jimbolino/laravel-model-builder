@@ -1,20 +1,22 @@
 <?php namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
- * Created by PhpStorm.
- * User: Jim
- * Date: 4-4-2015
- * Time: 23:13
+ * Class StringUtils, some handy string functions
+ * @package Jimbolino\Laravel\ModelBuilder
  */
-class StringUtils {
+abstract class StringUtils
+{
 
     /**
      * Add single quotes around a string
      * @param $string
      * @return string
      */
-    public static function singleQuote($string) {
-        if($string === 'null') return $string;
+    public static function singleQuote($string)
+    {
+        if ($string === 'null') {
+            return $string;
+        }
         return "'".$string."'";
     }
 
@@ -24,32 +26,46 @@ class StringUtils {
      * @param string $prefix
      * @return mixed
      */
-    public static function prettifyTableName($table, $prefix = '') {
-        if($prefix) {
-            $table = self::removePrefix($table,$prefix);
+    public static function prettifyTableName($table, $prefix = '')
+    {
+        if ($prefix) {
+            $table = self::removePrefix($table, $prefix);
         }
 
-        $tableParts = explode('_',$table);
+        $tableParts = explode('_', $table);
 
-        $table = implode('-',$tableParts);
+        $table = implode('-', $tableParts);
 
-        return self::dashesToCamelCase($table,true);
+        return self::dashesToCamelCase($table, true);
     }
 
-    // http://stackoverflow.com/a/2792045
-    public static function underscoresToCamelCase($string, $capitalizeFirstCharacter = false) {
+    /**
+     * Convert underscores to CamelCase
+     * borrowed from http://stackoverflow.com/a/2792045
+     * @param $string
+     * @param bool $capitalizeFirstChar
+     * @return mixed
+     */
+    public static function underscoresToCamelCase($string, $capitalizeFirstChar = false)
+    {
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-        if (!$capitalizeFirstCharacter) {
+        if (!$capitalizeFirstChar) {
             $str[0] = strtolower($str[0]);
         }
         return $str;
     }
 
-    // http://stackoverflow.com/a/2792045
-    public static function dashesToCamelCase($string, $capitalizeFirstCharacter = false)
+    /**
+     * Convert dashes to CamelCase
+     * borrowed from http://stackoverflow.com/a/2792045
+     * @param $string
+     * @param bool $capitalizeFirstChar
+     * @return mixed
+     */
+    public static function dashesToCamelCase($string, $capitalizeFirstChar = false)
     {
         $str = str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
-        if (!$capitalizeFirstCharacter) {
+        if (!$capitalizeFirstChar) {
             $str[0] = strtolower($str[0]);
         }
         return $str;
@@ -61,14 +77,18 @@ class StringUtils {
      * @param $haystack
      * @return bool
      */
-    public static function str_contains($needles, $haystack) {
-        if(!is_array($needles)) $needles = (array)$needles;
+    public static function strContains($needles, $haystack)
+    {
+        if (!is_array($needles)) {
+            $needles = (array)$needles;
+        }
 
-        foreach($needles as $needle) {
-            if (strpos($haystack,$needle) !== false) {
+        foreach ($needles as $needle) {
+            if (strpos($haystack, $needle) !== false) {
                 return true;
             }
         }
+        return false;
     }
 
     /**
@@ -77,13 +97,14 @@ class StringUtils {
      * @param $pieces
      * @return string
      */
-    public static function implodeAndQuote($glue, $pieces) {
-        foreach($pieces as &$piece) {
+    public static function implodeAndQuote($glue, $pieces)
+    {
+        foreach ($pieces as &$piece) {
             $piece = self::singleQuote($piece);
         }
         unset($piece);
 
-        return implode($glue,$pieces);
+        return implode($glue, $pieces);
     }
 
     /**
@@ -92,8 +113,9 @@ class StringUtils {
      * @param $prefix
      * @return string
      */
-    public static function removePrefix($table, $prefix) {
-        return substr($table,strlen($prefix));
+    public static function removePrefix($table, $prefix)
+    {
+        return substr($table, strlen($prefix));
     }
 
     /**
@@ -101,13 +123,13 @@ class StringUtils {
      * @param $value
      * @return string
      */
-    public static function safePlural($value) {
+    public static function safePlural($value)
+    {
         $plural = str_plural($value);
-        if($plural == $value) {
+        if ($plural == $value) {
             $plural = $value.'s';
             echo 'warning: automatic pluralization of '.$value.' failed, using '.$plural.LF;
         }
         return $plural;
     }
-
 }
