@@ -32,11 +32,7 @@ abstract class StringUtils
             $table = self::removePrefix($table, $prefix);
         }
 
-        $tableParts = explode('_', $table);
-
-        $table = implode('-', $tableParts);
-
-        return self::dashesToCamelCase($table, true);
+        return self::underscoresToCamelCase($table, true);
     }
 
     /**
@@ -49,22 +45,6 @@ abstract class StringUtils
     public static function underscoresToCamelCase($string, $capitalizeFirstChar = false)
     {
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-        if (!$capitalizeFirstChar) {
-            $str[0] = strtolower($str[0]);
-        }
-        return $str;
-    }
-
-    /**
-     * Convert dashes to CamelCase
-     * borrowed from http://stackoverflow.com/a/2792045
-     * @param $string
-     * @param bool $capitalizeFirstChar
-     * @return mixed
-     */
-    public static function dashesToCamelCase($string, $capitalizeFirstChar = false)
-    {
-        $str = str_replace(' ', '', ucwords(str_replace('-', ' ', $string)));
         if (!$capitalizeFirstChar) {
             $str[0] = strtolower($str[0]);
         }

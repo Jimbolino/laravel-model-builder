@@ -33,6 +33,8 @@ class ModelGenerator
      */
     public static $lineWrap = 120;
 
+    protected $prefix = '';
+
     protected $namespace = 'app';
 
     protected $path = '';
@@ -104,7 +106,7 @@ class ModelGenerator
 
             $result = $this->writeFile($table, $model);
 
-            echo 'file written: '.$result['filename'].' - '.$result['result'] . ' bytes'.LF;
+            echo 'file written: '.$result['filename'].' - '.$result['result'].' bytes'.LF;
         }
         echo 'done';
     }
@@ -123,7 +125,7 @@ class ModelGenerator
         foreach ($describe as $field) {
             if (count($describe) < 3) {
                 $type = $this->parseType($field->Type);
-                if ($type['type']=='int' && $field->Key == 'PRI') {
+                if ($type['type'] == 'int' && $field->Key == 'PRI') {
                     // should be a foreign key
                     if ($checkForeignKey && $this->isForeignKey($table, $field->Field)) {
                         $count++;
@@ -143,7 +145,7 @@ class ModelGenerator
     /**
      * Write the actual TableName.php file
      * @param $table
-     * @param $model
+     * @param Model $model
      * @return array
      * @throws Exception
      */
@@ -157,7 +159,7 @@ class ModelGenerator
             mkdir($this->path, 0777, true);
             umask($oldUMask);
             if (!is_dir($this->path)) {
-                throw new Exception('dir '. $this->path .' could not be created');
+                throw new Exception('dir '.$this->path.' could not be created');
             }
         }
         $result = file_put_contents($this->path.'/'.$filename, $model);
