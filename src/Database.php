@@ -1,22 +1,24 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
+
+namespace Jimbolino\Laravel\ModelBuilder;
 
 use DB;
 
 /**
- * Class Database, does all queries
- * @package Jimbolino\Laravel\ModelBuilder
+ * Class Database, does all queries.
  */
 abstract class Database
 {
     /**
-     * Execute a SHOW TABLES query
+     * Execute a SHOW TABLES query.
+     *
      * @return array with 'tables' and 'views'
      */
     public static function showTables($prefix)
     {
         $results = DB::select('SHOW FULL TABLES');
-        $tables = array();
-        $views = array();
+        $tables = [];
+        $views = [];
         $first = '';
         foreach ($results as $result) {
             // get the first element (table name)
@@ -39,23 +41,28 @@ abstract class Database
                 $tables[] = $first;
             }
         }
-        return array('tables' => $tables, 'views' => $views);
+
+        return ['tables' => $tables, 'views' => $views];
     }
 
     /**
-     * Execute a describe table query
+     * Execute a describe table query.
+     *
      * @param $table
+     *
      * @return mixed
      */
     public static function describeTable($table)
     {
         $result = DB::select('SHOW FULL COLUMNS FROM '.$table);
         $result = ArrayHelpers::indexArrayByValue($result, 'Field');
+
         return $result;
     }
 
     /**
-     * Return a sql result with all foreign keys (data from information_scheme)
+     * Return a sql result with all foreign keys (data from information_scheme).
+     *
      * @return mixed
      */
     public static function getAllForeignKeys()
@@ -63,11 +70,13 @@ abstract class Database
         $sql = 'SELECT * FROM information_schema.KEY_COLUMN_USAGE ';
         $sql .= 'WHERE REFERENCED_COLUMN_NAME IS NOT NULL AND REFERENCED_TABLE_SCHEMA = DATABASE()';
         $results = DB::select($sql);
+
         return $results;
     }
 
     /**
-     * Get the table prefix
+     * Get the table prefix.
+     *
      * @return mixed
      */
     public static function getTablePrefix()

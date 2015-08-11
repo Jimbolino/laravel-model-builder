@@ -1,12 +1,12 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
+
+namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
- * Class Relation, defines one single Relation entry
- * @package Jimbolino\Laravel\ModelBuilder
+ * Class Relation, defines one single Relation entry.
  */
 class Relation
 {
-
     protected $type;
     protected $remoteField;
     protected $localField;
@@ -15,7 +15,8 @@ class Relation
     protected $junctionTable;
 
     /**
-     * Create a relation object
+     * Create a relation object.
+     *
      * @param $type
      * @param $remoteField
      * @param $remoteTable
@@ -61,6 +62,7 @@ class Relation
 
         $string .= ');'.LF;
         $string .= TAB.'}'.LF.LF;
+
         return $string;
     }
 }
