@@ -1,14 +1,14 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
+
+namespace Jimbolino\Laravel\ModelBuilder;
 
 use Illuminate\Routing\Controller;
 
 /**
- * Class ModelGenerator5, Laravel 5 version for the ModelGenerator
- * @package Jimbolino\Laravel\ModelBuilder
+ * Class ModelGenerator5, Laravel 5 version for the ModelGenerator.
  */
 class ModelGenerator5 extends Controller
 {
-
     public function start()
     {
         // This is the model that all your others will extend
@@ -25,6 +25,5 @@ class ModelGenerator5 extends Controller
 
         $generator = new ModelGenerator($baseModel, $path, $namespace, $prefix);
         $generator->start();
-
     }
 }

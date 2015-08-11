@@ -1,15 +1,17 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
+
+namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
- * Class StringUtils, some handy string functions
- * @package Jimbolino\Laravel\ModelBuilder
+ * Class StringUtils, some handy string functions.
  */
 abstract class StringUtils
 {
-
     /**
-     * Add single quotes around a string
+     * Add single quotes around a string.
+     *
      * @param $string
+     *
      * @return string
      */
     public static function singleQuote($string)
@@ -17,13 +19,16 @@ abstract class StringUtils
         if ($string === 'null') {
             return $string;
         }
+
         return "'".$string."'";
     }
 
     /**
      * Convert a mysql table name to a class name, optionally removing a prefix.
+     *
      * @param $table
      * @param string $prefix
+     *
      * @return mixed
      */
     public static function prettifyTableName($table, $prefix = '')
@@ -37,9 +42,11 @@ abstract class StringUtils
 
     /**
      * Convert underscores to CamelCase
-     * borrowed from http://stackoverflow.com/a/2792045
+     * borrowed from http://stackoverflow.com/a/2792045.
+     *
      * @param $string
      * @param bool $capitalizeFirstChar
+     *
      * @return mixed
      */
     public static function underscoresToCamelCase($string, $capitalizeFirstChar = false)
@@ -48,19 +55,22 @@ abstract class StringUtils
         if (!$capitalizeFirstChar) {
             $str[0] = strtolower($str[0]);
         }
+
         return $str;
     }
 
     /**
-     * Check if a string (haystack) contains one or more words (needles)
+     * Check if a string (haystack) contains one or more words (needles).
+     *
      * @param $needles
      * @param $haystack
+     *
      * @return bool
      */
     public static function strContains($needles, $haystack)
     {
         if (!is_array($needles)) {
-            $needles = (array)$needles;
+            $needles = (array) $needles;
         }
 
         foreach ($needles as $needle) {
@@ -68,13 +78,16 @@ abstract class StringUtils
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Add a single quote to all pieces, then implode with the given glue
+     * Add a single quote to all pieces, then implode with the given glue.
+     *
      * @param $glue
      * @param $pieces
+     *
      * @return string
      */
     public static function implodeAndQuote($glue, $pieces)
@@ -88,9 +101,11 @@ abstract class StringUtils
     }
 
     /**
-     * Remove a prefix from a table name
+     * Remove a prefix from a table name.
+     *
      * @param $table
      * @param $prefix
+     *
      * @return string
      */
     public static function removePrefix($table, $prefix)
@@ -99,8 +114,10 @@ abstract class StringUtils
     }
 
     /**
-     * Use laravel pluralization, and if that one fails give a warning and just append "s"
+     * Use laravel pluralization, and if that one fails give a warning and just append "s".
+     *
      * @param $value
+     *
      * @return string
      */
     public static function safePlural($value)
@@ -110,6 +127,7 @@ abstract class StringUtils
             $plural = $value.'s';
             echo 'warning: automatic pluralization of '.$value.' failed, using '.$plural.LF;
         }
+
         return $plural;
     }
 }

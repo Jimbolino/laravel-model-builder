@@ -1,29 +1,30 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
+
+namespace Jimbolino\Laravel\ModelBuilder;
 
 /**
- * Class Relations, manages all relations of one model
- * @package Jimbolino\Laravel\ModelBuilder
+ * Class Relations, manages all relations of one model.
  */
 class Relations
 {
-
     // input
     private $localTable = '';
-    private $foreignKeys = array();
-    private $describes = array();
-    private $foreignKeysByTable = array();
+    private $foreignKeys = [];
+    private $describes = [];
+    private $foreignKeysByTable = [];
     private $prefix = '';
 
     // temporary
-    private $manyToMany = array();
+    private $manyToMany = [];
 
     /**
      * @var Relation[]
      */
-    private $relations = array();
+    private $relations = [];
 
     /**
-     * This is where the magic happens
+     * This is where the magic happens.
+     *
      * @param $localTable
      * @param $foreignKeys
      * @param $describes
@@ -85,13 +86,14 @@ class Relations
             $junctionTable = $foreignKey->TABLE_NAME;
             $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix, $junctionTable);
         }
-
     }
 
     /**
-     * Try to determine the type of the relation
+     * Try to determine the type of the relation.
+     *
      * @param $foreignKey
      * @param $remote
+     *
      * @return string
      */
     protected function findType($foreignKey, $remote)
@@ -103,16 +105,18 @@ class Relations
             if ($this->isHasOne($foreignKey)) {
                 return 'hasOne';
             }
-            return 'hasMany';
 
+            return 'hasMany';
         } else {
             return 'belongsTo';
         }
     }
 
     /**
-     * One to one: The relationship is from a primary key to another primary key
+     * One to one: The relationship is from a primary key to another primary key.
+     *
      * @param $foreignKey
+     *
      * @return bool
      */
     protected function isHasOne($foreignKey)
@@ -125,12 +129,15 @@ class Relations
                 }
             }
         }
+
         return false;
     }
 
     /**
-     * Many to many
+     * Many to many.
+     *
      * @param $foreignKey
+     *
      * @return bool
      */
     protected function isBelongsToMany($foreignKey)
@@ -145,12 +152,13 @@ class Relations
         if ($count == 2) {
             return true;
         }
+
         return false;
     }
 
-
     /**
-     * Outputs all relations to a string
+     * Outputs all relations to a string.
+     *
      * @return string
      */
     public function __toString()
@@ -159,6 +167,7 @@ class Relations
         foreach ($this->relations as $relation) {
             $res .= $relation->__toString();
         }
+
         return $res;
     }
 }

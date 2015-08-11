@@ -1,34 +1,36 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
+
+namespace Jimbolino\Laravel\ModelBuilder;
 
 use Exception;
 
 /**
- * Class ModelGenerator
+ * Class ModelGenerator.
  *
  * This is a basic class that analyzes your current database with SHOW TABLES and DESCRIBE.
  * The result will be written in Laravel Model files.
  * Warning: all files are overwritten, so do not let this one write in your current model directory.
  *
  * @author Jimbolino
+ *
  * @since 02-2015
- * @package Jimbolino\Laravel\ModelBuilder
  */
 class ModelGenerator
 {
+    protected $foreignKeys = [];
 
-    protected $foreignKeys = array();
+    protected $junctionTables = [];
 
-    protected $junctionTables = array();
+    protected $tables = [];
 
-    protected $tables = array();
+    protected $views = [];
 
-    protected $views = array();
-
-    protected $describes = array();
+    protected $describes = [];
 
     /**
      * There MUST NOT be a hard limit on line length; the soft limit MUST be 120 characters;
-     * https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md#1-overview
+     * https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-2-coding-style-guide.md#1-overview.
+     *
      * @var int
      */
     public static $lineWrap = 120;
@@ -43,13 +45,12 @@ class ModelGenerator
 
     /**
      * @param string $baseModel (the model that all your others will extend)
-     * @param string $path (the path where we will store your new models)
+     * @param string $path      (the path where we will store your new models)
      * @param string $namespace (the namespace of the models)
-     * @param string $prefix (the configured table prefix)
+     * @param string $prefix    (the configured table prefix)
      */
     public function __construct($baseModel = '', $path = '', $namespace = '', $prefix = '')
     {
-
         if (!defined('TAB')) {
             define('TAB', '    '); // Code MUST use 4 spaces for indenting, not tabs.
         }
@@ -67,7 +68,8 @@ class ModelGenerator
     }
 
     /**
-     * This is where we start
+     * This is where we start.
+     *
      * @throws Exception
      */
     public function start()
@@ -90,7 +92,6 @@ class ModelGenerator
         }
         unset($table);
 
-
         foreach ($this->tables as $table) {
             $model = new Model();
             $model->buildModel(
@@ -112,9 +113,11 @@ class ModelGenerator
     }
 
     /**
-     * Detect many to many tables
+     * Detect many to many tables.
+     *
      * @param $table
      * @param bool $checkForeignKey
+     *
      * @return bool
      */
     protected function isManyToMany($table, $checkForeignKey = true)
@@ -139,15 +142,19 @@ class ModelGenerator
         if ($count == 2) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Write the actual TableName.php file
+     * Write the actual TableName.php file.
+     *
      * @param $table
      * @param Model $model
-     * @return array
+     *
      * @throws Exception
+     *
+     * @return array
      */
     protected function writeFile($table, $model)
     {
@@ -163,17 +170,20 @@ class ModelGenerator
             }
         }
         $result = file_put_contents($this->path.'/'.$filename, $model);
-        return array('filename' => $this->path.'/'.$filename, 'result' => $result);
+
+        return ['filename' => $this->path.'/'.$filename, 'result' => $result];
     }
 
     /**
-     * Parse int(10) unsigned to something useful
+     * Parse int(10) unsigned to something useful.
+     *
      * @param string $type
+     *
      * @return array
      */
     protected function parseType($type)
     {
-        $result = array();
+        $result = [];
 
         // get unsigned
         $result['unsigned'] = false;
@@ -193,23 +203,25 @@ class ModelGenerator
         return $result;
     }
 
-
-
     /**
-     * Return an array with tables, with arrays of foreign keys
+     * Return an array with tables, with arrays of foreign keys.
+     *
      * @return array|mixed
      */
     protected function getAllForeignKeysOrderedByTable()
     {
         $results = Database::getAllForeignKeys();
         $results = ArrayHelpers::orderArrayByValue($results, 'TABLE_NAME');
+
         return $results;
     }
 
     /**
-     * Check if a given field in a table is a foreign key
+     * Check if a given field in a table is a foreign key.
+     *
      * @param $table
      * @param $field
+     *
      * @return bool
      */
     protected function isForeignKey($table, $field)
@@ -219,12 +231,15 @@ class ModelGenerator
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Check if the given name starts with the current prefix
+     * Check if the given name starts with the current prefix.
+     *
      * @param $name
+     *
      * @return bool
      */
     protected function isPrefix($name)
@@ -232,6 +247,7 @@ class ModelGenerator
         if (empty($this->prefix)) {
             return true;
         }
+
         return starts_with($name, $this->prefix);
     }
 }

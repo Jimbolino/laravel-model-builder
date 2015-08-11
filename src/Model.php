@@ -1,31 +1,31 @@
-<?php namespace Jimbolino\Laravel\ModelBuilder;
+<?php
 
-use ReflectionClass;
+namespace Jimbolino\Laravel\ModelBuilder;
+
 use Exception;
+use ReflectionClass;
 
 /**
- * Class Model, a representation of one Laravel model
- * @package Jimbolino\Laravel\ModelBuilder
+ * Class Model, a representation of one Laravel model.
  */
 class Model
 {
-
     // input
     private $baseModel = 'Model';
     private $table = '';
-    private $foreignKeys = array();
+    private $foreignKeys = [];
 
     // the class and table names
     private $class = '';
 
     // auto detected the elements
-    private $timestampFields = array();
+    private $timestampFields = [];
     private $primaryKey = '';
     private $incrementing = false;
     private $timestamps = false;
-    private $dates = array();
-    private $hidden = array();
-    private $fillable = array();
+    private $dates = [];
+    private $hidden = [];
+    private $fillable = [];
     private $namespace = '';
 
     /**
@@ -37,7 +37,8 @@ class Model
     private $fileContents = '';
 
     /**
-     * First build the model
+     * First build the model.
+     *
      * @param $table
      * @param $baseModel
      * @param $describes
@@ -60,7 +61,6 @@ class Model
         $this->timestampFields = $this->getTimestampFields($this->baseModel);
 
         $describe = $describes[$table];
-
 
         // main loop
         foreach ($describe as $field) {
@@ -99,15 +99,13 @@ class Model
             $foreignKeysByTable,
             $prefix
         );
-
     }
 
     /**
-     * Secondly, create the model
+     * Secondly, create the model.
      */
     public function createModel()
     {
-
         $file = '<?php'.$this->namespace.LF.LF;
 
         $file .= '/**'.LF;
@@ -165,7 +163,8 @@ class Model
     }
 
     /**
-     * Thirdly, return the created string
+     * Thirdly, return the created string.
+     *
      * @return string
      */
     public function __toString()
@@ -173,36 +172,40 @@ class Model
         return $this->fileContents;
     }
 
-
     /**
      * Detect if we have timestamp field
-     * TODO: not sure about this one yet
+     * TODO: not sure about this one yet.
+     *
      * @param $model
+     *
      * @return array
      */
     protected function getTimestampFields($model)
     {
         try {
             $baseModel = new ReflectionClass($model);
-            $timestampFields = array(
+            $timestampFields = [
                 'created_at' => $baseModel->getConstant('CREATED_AT'),
                 'updated_at' => $baseModel->getConstant('UPDATED_AT'),
                 'deleted_at' => $baseModel->getConstant('DELETED_AT'),
-            );
+            ];
         } catch (Exception $e) {
             echo 'baseModel: '.$model.' not found'.LF;
-            $timestampFields = array(
+            $timestampFields = [
                 'created_at' => 'created_at',
                 'updated_at' => 'updated_at',
-                'deleted_at' => 'deleted_at'
-            );
+                'deleted_at' => 'deleted_at',
+            ];
         }
+
         return $timestampFields;
     }
 
     /**
-     * Check if the field is primary key
+     * Check if the field is primary key.
+     *
      * @param $field
+     *
      * @return bool
      */
     protected function isPrimaryKey($field)
@@ -210,12 +213,15 @@ class Model
         if ($field->Key == 'PRI') {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Check if the field (primary key) is auto incrementing
+     * Check if the field (primary key) is auto incrementing.
+     *
      * @param $field
+     *
      * @return bool
      */
     protected function isIncrementing($field)
@@ -223,12 +229,15 @@ class Model
         if ($field->Extra == 'auto_increment') {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Check if we have timestamp field
+     * Check if we have timestamp field.
+     *
      * @param $field
+     *
      * @return bool
      */
     protected function isTimestampField($field)
@@ -236,39 +245,48 @@ class Model
         if (array_search($field->Field, $this->timestampFields)) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Check if we have a date field
+     * Check if we have a date field.
+     *
      * @param $field
+     *
      * @return bool
      */
     protected function isDate($field)
     {
-        if (StringUtils::strContains(array('date', 'time', 'year'), $field->Type)) {
+        if (StringUtils::strContains(['date', 'time', 'year'], $field->Type)) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Check if we have a hidden field
+     * Check if we have a hidden field.
+     *
      * @param $field
+     *
      * @return bool
      */
     protected function isHidden($field)
     {
-        if (StringUtils::strContains(array('hidden', 'secret'), $field->Comment)) {
+        if (StringUtils::strContains(['hidden', 'secret'], $field->Comment)) {
             return true;
         }
+
         return false;
     }
 
     /**
-     * Check if we have a foreign key
+     * Check if we have a foreign key.
+     *
      * @param $table
      * @param $field
+     *
      * @return bool
      */
     protected function isForeignKey($table, $field)
@@ -278,18 +296,21 @@ class Model
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Only show the keys where table is mentioned
+     * Only show the keys where table is mentioned.
+     *
      * @param $foreignKeys
      * @param $table
+     *
      * @return array
      */
     protected function filterAndSeparateForeignKeys($foreignKeys, $table)
     {
-        $results = array('local' => array(), 'remote' => array());
+        $results = ['local' => [], 'remote' => []];
         foreach ($foreignKeys as $foreignKey) {
             if ($foreignKey->TABLE_NAME == $table) {
                 $results['local'][] = $foreignKey;
@@ -298,6 +319,7 @@ class Model
                 $results['remote'][] = $foreignKey;
             }
         }
+
         return $results;
     }
 }
