@@ -36,7 +36,7 @@ class ConsoleCommand extends Command
         $path = storage_path('models');
 
         if ($this->option('output')) {
-            $path =  $this->option('output');
+            $path = $this->option('output');
         }
 
         // The namespace of the models
