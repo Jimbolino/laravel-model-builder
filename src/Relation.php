@@ -55,7 +55,7 @@ class Relation
         //if(!NamingConvention::foreignKey($this->remoteField, $this->remoteTable, $this->remoteField)) {
             $string .= ', '.StringUtils::singleQuote($this->remoteField);
         //}
-        
+
         //if(!NamingConvention::primaryKey($this->localField)) {
             $string .= ', '.StringUtils::singleQuote($this->localField);
         //}
