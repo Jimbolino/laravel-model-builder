@@ -45,9 +45,9 @@ class Relations
         // do local keys
         foreach ($foreignKeys['local'] as $foreignKey) {
             $type = $this->findType($foreignKey, false);
-            $remoteField = $foreignKey->REFERENCED_COLUMN_NAME;
+            $remoteField = $foreignKey->COLUMN_NAME;
             $remoteTable = $foreignKey->REFERENCED_TABLE_NAME;
-            $localField = $foreignKey->COLUMN_NAME;
+            $localField = $foreignKey->REFERENCED_COLUMN_NAME;
             $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix);
         }
 
