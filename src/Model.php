@@ -97,7 +97,8 @@ class Model
             $this->foreignKeys,
             $describes,
             $foreignKeysByTable,
-            $prefix
+            $prefix,
+            $namespace
         );
     }
 

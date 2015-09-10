@@ -21,16 +21,20 @@ class Relation
      * @param $remoteField
      * @param $remoteTable
      * @param $localField
-     * @param string $prefix
+     * @param $prefix
+     * @param $namespace
      * @param string $junctionTable
      */
-    public function __construct($type, $remoteField, $remoteTable, $localField, $prefix = '', $junctionTable = '')
+    public function __construct($type, $remoteField, $remoteTable, $localField, $prefix, $namespace, $junctionTable = '')
     {
         $this->type = $type;
         $this->remoteField = $remoteField;
         $this->localField = $localField;
         $this->remoteFunction = StringUtils::underscoresToCamelCase(StringUtils::removePrefix($remoteTable, $prefix));
         $this->remoteClass = StringUtils::prettifyTableName($remoteTable, $prefix);
+        if (!empty($namespace)) {
+            $this->remoteClass = $namespace.'\\'.$this->remoteClass;
+        }
         $this->junctionTable = StringUtils::removePrefix($junctionTable, $prefix);
 
         if ($this->type == 'belongsToMany') {
