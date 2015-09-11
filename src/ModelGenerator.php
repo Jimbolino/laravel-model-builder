@@ -60,6 +60,11 @@ class ModelGenerator
         if (!defined('CR')) {
             define('CR', "\r");
         }
+        if(PHP_SAPI == 'cli') {
+            define('BR', "\n");
+        } else {
+            define('BR', '<br />');
+        }
 
         $this->baseModel = $baseModel;
         $this->path = $path;
@@ -74,7 +79,6 @@ class ModelGenerator
      */
     public function start()
     {
-        echo '<pre>';
         $tablesAndViews = Database::showTables($this->prefix);
         $this->tables = $tablesAndViews['tables'];
         $this->views = $tablesAndViews['views'];
@@ -107,9 +111,10 @@ class ModelGenerator
 
             $result = $this->writeFile($table, $model);
 
-            echo 'file written: '.$result['filename'].' - '.$result['result'].' bytes'.LF;
+            echo 'file written: '.$result['filename'].' - '.$result['result'].' bytes'.BR;
+            flush();
         }
-        echo 'done';
+        echo 'done'.BR;
     }
 
     /**
