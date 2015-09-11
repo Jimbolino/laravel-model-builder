@@ -70,7 +70,7 @@ abstract class StringUtils
     public static function strContains($needles, $haystack)
     {
         if (!is_array($needles)) {
-            $needles = (array) $needles;
+            $needles = (array)$needles;
         }
 
         foreach ($needles as $needle) {
