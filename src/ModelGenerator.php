@@ -60,7 +60,7 @@ class ModelGenerator
         if (!defined('CR')) {
             define('CR', "\r");
         }
-        if(PHP_SAPI == 'cli') {
+        if (PHP_SAPI == 'cli') {
             define('BR', "\n");
         } else {
             define('BR', '<br />');
