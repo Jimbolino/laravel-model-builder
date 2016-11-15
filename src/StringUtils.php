@@ -52,7 +52,7 @@ abstract class StringUtils
     public static function underscoresToCamelCase($string, $capitalizeFirstChar = false)
     {
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-        if (!$capitalizeFirstChar) {
+        if (!empty($str) && !$capitalizeFirstChar) {
             $str[0] = strtolower($str[0]);
         }
 
