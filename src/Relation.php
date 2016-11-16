@@ -39,6 +39,9 @@ class Relation
 
         if ($this->type == 'belongsToMany') {
             $this->remoteFunction = StringUtils::safePlural($this->remoteFunction);
+            // many to many has reversed fields
+            $this->remoteField = $localField;
+            $this->localField = $remoteField;
         }
     }
 
