@@ -155,10 +155,10 @@ class Model
         }
 
         // add all relations
-        $file .= $this->relations;
+        $file .= rtrim($this->relations).LF; // remove one LF from end
 
         // close the class
-        $file .= '}'.LF.LF;
+        $file .= '}'.LF;
 
         $this->fileContents = $file;
     }
