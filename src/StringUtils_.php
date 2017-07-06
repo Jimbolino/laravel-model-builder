@@ -37,10 +37,7 @@ abstract class StringUtils
             $table = self::removePrefix($table, $prefix);
         }
 
-        $camel    = self::underscoresToCamelCase($table, true);
-        $singular = self::safeSingular($camel);
-
-        return $singular;
+        return self::underscoresToCamelCase($table, true);
     }
 
     /**
@@ -55,7 +52,7 @@ abstract class StringUtils
     public static function underscoresToCamelCase($string, $capitalizeFirstChar = false)
     {
         $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-        if (!$capitalizeFirstChar) {
+        if (!empty($str) && !$capitalizeFirstChar) {
             $str[0] = strtolower($str[0]);
         }
 
@@ -132,22 +129,5 @@ abstract class StringUtils
         }
 
         return $plural;
-    }
-
-    /**
-     * Use laravel singularization, and if that one fails give a warning.
-     *
-     * @param $value
-     *
-     * @return string
-     */
-    public static function safeSingular($value)
-    {
-        $singular = str_singular($value);
-        if ($singular == $value) {
-            echo 'warning: automatic singularization of ' . $value . ' failed, using ' . $singular . LF;
-        }
-
-        return $singular;
     }
 }
