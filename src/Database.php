@@ -54,7 +54,7 @@ abstract class Database
      */
     public static function describeTable($table)
     {
-        $result = DB::select('SHOW FULL COLUMNS FROM '.$table);
+        $result = DB::select("SHOW FULL COLUMNS FROM `{$table}`");
         $result = ArrayHelpers::indexArrayByValue($result, 'Field');
 
         return $result;
