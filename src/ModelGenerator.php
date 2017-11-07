@@ -59,9 +59,6 @@ class ModelGenerator
         if (!defined('LF')) {
             define('LF', "\n");
         }
-        if (!defined('CR')) {
-            define('CR', "\r");
-        }
         if (PHP_SAPI == 'cli') {
             define('BR', "\n");
         } else {
