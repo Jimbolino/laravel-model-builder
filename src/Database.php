@@ -16,7 +16,8 @@ class Database
      */
     public static function showTables($prefix)
     {
-        $results = self::select('SHOW FULL TABLES');
+        $results = static::select('SHOW FULL TABLES');
+
         $tables = [];
         $views = [];
         $first = '';
@@ -54,7 +55,7 @@ class Database
      */
     public static function describeTable($table)
     {
-        $result = self::select("SHOW FULL COLUMNS FROM `{$table}`");
+        $result = static::select("SHOW FULL COLUMNS FROM `{$table}`");
         $result = ArrayHelpers::indexArrayByValue($result, 'Field');
 
         return $result;
@@ -69,7 +70,7 @@ class Database
     {
         $sql = 'SELECT * FROM information_schema.KEY_COLUMN_USAGE ';
         $sql .= 'WHERE REFERENCED_COLUMN_NAME IS NOT NULL AND REFERENCED_TABLE_SCHEMA = DATABASE()';
-        $results = self::select($sql);
+        $results = static::select($sql);
 
         return $results;
     }
