@@ -7,7 +7,7 @@ use DB;
 /**
  * Class Database, does all queries.
  */
-abstract class Database
+class Database
 {
     /**
      * Execute a SHOW TABLES query.

@@ -43,6 +43,8 @@ class ModelGenerator
 
     protected $baseModel = 'Eloquent';
 
+    protected $dataBase;
+
     /**
      * @param string $baseModel (the model that all your others will extend)
      * @param string $path      (the path where we will store your new models)
@@ -70,6 +72,17 @@ class ModelGenerator
         $this->path = $path;
         $this->namespace = $namespace;
         $this->prefix = $prefix;
+        $this->dataBase = new Database();
+    }
+
+    public function setDatabase($database)
+    {
+        $this->dataBase = $database;
+    }
+
+    public function getDatabase()
+    {
+        return $this->dataBase;
     }
 
     /**
@@ -79,15 +92,15 @@ class ModelGenerator
      */
     public function start()
     {
-        $tablesAndViews = Database::showTables($this->prefix);
+        $tablesAndViews = $this->dataBase->showTables($this->prefix);
         $this->tables = $tablesAndViews['tables'];
         $this->views = $tablesAndViews['views'];
 
-        $this->foreignKeys['all'] = Database::getAllForeignKeys();
+        $this->foreignKeys['all'] = $this->dataBase->getAllForeignKeys();
         $this->foreignKeys['ordered'] = $this->getAllForeignKeysOrderedByTable();
 
         foreach ($this->tables as $key => $table) {
-            $this->describes[$table] = Database::describeTable($table);
+            $this->describes[$table] = $this->dataBase->describeTable($table);
 
             if ($this->isManyToMany($table, true)) {
                 $this->junctionTables[] = $table;
@@ -127,7 +140,7 @@ class ModelGenerator
      */
     protected function isManyToMany($table, $checkForeignKey = true)
     {
-        $describe = Database::describeTable($table);
+        $describe = $this->dataBase->describeTable($table);
 
         $count = 0;
         foreach ($describe as $field) {
@@ -215,7 +228,7 @@ class ModelGenerator
      */
     protected function getAllForeignKeysOrderedByTable()
     {
-        $results = Database::getAllForeignKeys();
+        $results = $this->dataBase->getAllForeignKeys();
         $results = ArrayHelpers::orderArrayByValue($results, 'TABLE_NAME');
 
         return $results;
