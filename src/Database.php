@@ -16,7 +16,7 @@ abstract class Database
      */
     public static function showTables($prefix)
     {
-        $results = DB::select('SHOW FULL TABLES');
+        $results = self::select('SHOW FULL TABLES');
         $tables = [];
         $views = [];
         $first = '';
@@ -54,7 +54,7 @@ abstract class Database
      */
     public static function describeTable($table)
     {
-        $result = DB::select("SHOW FULL COLUMNS FROM `{$table}`");
+        $result = self::select("SHOW FULL COLUMNS FROM `{$table}`");
         $result = ArrayHelpers::indexArrayByValue($result, 'Field');
 
         return $result;
@@ -69,7 +69,7 @@ abstract class Database
     {
         $sql = 'SELECT * FROM information_schema.KEY_COLUMN_USAGE ';
         $sql .= 'WHERE REFERENCED_COLUMN_NAME IS NOT NULL AND REFERENCED_TABLE_SCHEMA = DATABASE()';
-        $results = DB::select($sql);
+        $results = self::select($sql);
 
         return $results;
     }
@@ -82,5 +82,10 @@ abstract class Database
     public static function getTablePrefix()
     {
         return DB::getTablePrefix();
+    }
+
+    public static function select($query)
+    {
+        return DB::select($query);
     }
 }
