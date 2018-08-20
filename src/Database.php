@@ -2,8 +2,6 @@
 
 namespace Jimbolino\Laravel\ModelBuilder;
 
-use DB;
-
 /**
  * Class Database, does all queries.
  */
@@ -82,11 +80,11 @@ class Database
      */
     public static function getTablePrefix()
     {
-        return DB::getTablePrefix();
+        return app('db')->getTablePrefix();
     }
 
     public static function select($query)
     {
-        return DB::select($query);
+        return app('db')->select($query);
     }
 }
