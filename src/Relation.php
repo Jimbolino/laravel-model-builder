@@ -51,25 +51,31 @@ class Relation
     public function __toString()
     {
         $string = TAB . '/**' . LF;
-        $string .= TAB . '* Relationship with the ' . $this->remoteClass . ' model.' . LF;
-        $string .= TAB . '* ' . LF;
-        $string .= TAB . '* @return    Illuminate\Database\Eloquent\Relations\\' . $this->type . LF;
-        $string .= TAB . '*/ ' . LF;
+        $string .= TAB . ' * Relationship with the ' . class_basename($this->remoteClass) . ' model.' . LF;
+        $string .= TAB . ' * ' . LF;
+        $string .= TAB . ' * @return  Illuminate\Database\Eloquent\Relations\\' . title_case($this->type) . LF;
+        $string .= TAB . ' */ ' . LF;
         $string .= TAB . 'public function ' . $this->remoteFunction . '()' . LF;
         $string .= TAB . '{' . LF;
         $string .= TAB . TAB . 'return $this->' . $this->type . '(';
-        $string .= StringUtils::singleQuote($this->remoteClass);
+        $string .= class_basename($this->remoteClass) . '::class';
 
         if ($this->type == 'belongsToMany') {
             $string .= ', ' . StringUtils::singleQuote($this->junctionTable);
         }
 
-        //if(!NamingConvention::foreignKey($this->remoteField, $this->remoteTable, $this->remoteField)) {
-        $string .= ', ' . StringUtils::singleQuote($this->remoteField);
-        //}
+        if ($this->type == 'belongsTo') {
+            $string .= ', ' . class_basename($this->remoteClass) . '::FOREIGN_KEY';
+        }
+
+        if ($this->type == 'hasMany') {
+            $string .= ', self::FOREIGN_KEY';
+        }
+
+        // $string .= ', ' . StringUtils::singleQuote($this->remoteField);
 
         //if(!NamingConvention::primaryKey($this->localField)) {
-        $string .= ', ' . StringUtils::singleQuote($this->localField);
+        // $string .= ', ' . StringUtils::singleQuote($this->localField);
         //}
 
         $string .= ');' . LF;

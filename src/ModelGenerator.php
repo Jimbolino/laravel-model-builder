@@ -67,9 +67,9 @@ class ModelGenerator
         }
 
         $this->baseModel = $baseModel;
-        $this->path = $path;
+        $this->path      = $path;
         $this->namespace = $namespace;
-        $this->prefix = $prefix;
+        $this->prefix    = $prefix;
     }
 
     /**
@@ -80,10 +80,10 @@ class ModelGenerator
     public function start()
     {
         $tablesAndViews = Database::showTables($this->prefix);
-        $this->tables = $tablesAndViews['tables'];
-        $this->views = $tablesAndViews['views'];
+        $this->tables   = $tablesAndViews['tables'];
+        $this->views    = $tablesAndViews['views'];
 
-        $this->foreignKeys['all'] = Database::getAllForeignKeys();
+        $this->foreignKeys['all']     = Database::getAllForeignKeys();
         $this->foreignKeys['ordered'] = $this->getAllForeignKeysOrderedByTable();
 
         foreach ($this->tables as $key => $table) {
@@ -111,10 +111,10 @@ class ModelGenerator
 
             $result = $this->writeFile($table, $model);
 
-            echo 'file written: '.$result['filename'].' - '.$result['result'].' bytes'.BR;
+            echo 'file written: ' . $result['filename'] . ' - ' . $result['result'] . ' bytes' . BR;
             flush();
         }
-        echo 'done'.BR;
+        // echo 'done' . BR;
     }
 
     /**
@@ -163,20 +163,20 @@ class ModelGenerator
      */
     protected function writeFile($table, $model)
     {
-        $filename = StringUtils::prettifyTableName($table, $this->prefix).'.php';
+        $filename = StringUtils::prettifyTableName($table, $this->prefix) . '.php';
 
         if (!is_dir($this->path)) {
             $oldUMask = umask(0);
-            echo 'creating path: '.$this->path.LF;
+            echo 'creating path: ' . $this->path . LF;
             mkdir($this->path, 0777, true);
             umask($oldUMask);
             if (!is_dir($this->path)) {
-                throw new Exception('dir '.$this->path.' could not be created');
+                throw new Exception('dir ' . $this->path . ' could not be created');
             }
         }
-        $result = file_put_contents($this->path.'/'.$filename, $model);
+        $result = file_put_contents($this->path . '/' . $filename, $model);
 
-        return ['filename' => $this->path.'/'.$filename, 'result' => $result];
+        return ['filename' => $this->path . '/' . $filename, 'result' => $result];
     }
 
     /**
@@ -192,14 +192,14 @@ class ModelGenerator
 
         // get unsigned
         $result['unsigned'] = false;
-        $type = explode(' ', $type);
+        $type               = explode(' ', $type);
 
         if (isset($type[1]) && $type[1] === 'unsigned') {
             $result['unsigned'] = true;
         }
 
         // int(11) + varchar(255) = $type = varchar, $size = 255
-        $type = explode('(', $type[0]);
+        $type           = explode('(', $type[0]);
         $result['type'] = $type[0];
         if (isset($type[1])) {
             $result['size'] = intval($type[1]);

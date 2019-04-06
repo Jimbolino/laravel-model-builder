@@ -17,9 +17,9 @@ abstract class Database
     public static function showTables($prefix)
     {
         $results = DB::select('SHOW FULL TABLES');
-        $tables = [];
-        $views = [];
-        $first = '';
+        $tables  = [];
+        $views   = [];
+        $first   = '';
         foreach ($results as $result) {
             // get the first element (table name)
             foreach ($result as $value) {
@@ -54,7 +54,7 @@ abstract class Database
      */
     public static function describeTable($table)
     {
-        $result = DB::select('SHOW FULL COLUMNS FROM '.$table);
+        $result = DB::select('SHOW FULL COLUMNS FROM `' . $table . "`");
         $result = ArrayHelpers::indexArrayByValue($result, 'Field');
 
         return $result;
