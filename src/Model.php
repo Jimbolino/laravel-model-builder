@@ -25,6 +25,8 @@ class Model
     private $timestamps      = false;
     private $dates           = [];
     private $hidden          = [];
+    private $enum = [];
+    private $json = [];
     private $fillable        = [];
     private $namespace       = '';
 
@@ -75,6 +77,20 @@ class Model
                 continue;
             }
 
+            if ($this->isJson($field)) {
+            	$this->json[$field->Field] = 'array';
+			}
+
+            if ($this->isEnum($field)) {
+            	$variables = $field->Type;
+				$enums = explode(',',trim(explode(')',explode('enum(', $variables)[1])[0]));
+				foreach($enums as &$enum) {
+					$enum = str_replace("'", "", $enum);
+				}
+				unset($enum);
+                $this->enum[$field->Field] = $enums;
+            }
+
             if ($this->isDate($field)) {
                 $this->dates[] = $field->Field;
             }
@@ -115,6 +131,17 @@ class Model
         $file .= 'class ' . $this->class . ' extends ' . $this->baseModel . LF;
         $file .= '{' . LF . LF;
 
+		if(!empty($this->enum)){
+			foreach($this->enum as $field_name => $field){
+				foreach($field as $const){
+					$key = strtoupper($field_name).'_'.strtoupper($const);
+					$file .= TAB.'const '.$key.' = '.StringUtils::singleQuote($const).';'.LF;
+
+				}
+				$file .= LF;
+			}
+
+		}
         // the name of the mysql table
         $file .= TAB . '/**' . LF;
         $file .= TAB . ' * The table associated with the model ' . $this->class . LF;
@@ -158,8 +185,11 @@ class Model
             $file .= TAB . ' *' . LF;
             $file .= TAB . ' * @var array' . LF;
             $file .= TAB . ' */' . LF;
-            $file .= TAB . 'protected $fillable = [' . LF . TAB . TAB . StringUtils::implodeAndQuote(', ', $this->fillable) . LF . TAB . '];' . LF . LF;
-        }
+		if(!empty($this->json)){
+            $file .= TAB.'protected $casts = [' .LF.
+				StringUtils::implodeKeyValueAndQuote(','.LF, $this->json, TAB.TAB).LF.
+				TAB.'];'.LF.LF;
+		}
 
         // $file .= wordwrap($wrap, ModelGenerator::$lineWrap, LF . TAB . TAB);
 
@@ -280,12 +310,36 @@ class Model
     }
 
     /**
-     * Check if we have a date field.
+     * Check if we have a json field.
      *
      * @param $field
      *
      * @return bool
      */
+    protected function isJson($field)
+    {
+        if (StringUtils::strContains(['json'], $field->Type)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if we have a enum field.
+     *
+     * @param $field
+     *
+     * @return bool
+     */
+    protected function isEnum($field)
+    {
+        if (StringUtils::strContains(['enum'], $field->Type)) {
+            return true;
+        }
+
+        return false;
+    }
     protected function isDate($field)
     {
         if (StringUtils::strContains(['date', 'time', 'year', 'timestamp'], $field->Type)) {

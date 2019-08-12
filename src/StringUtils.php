@@ -84,7 +84,13 @@ abstract class StringUtils
 
         return false;
     }
-
+	public static function implodeKeyValueAndQuote($glue, $pieces, $extra_glue = false){
+    	foreach($pieces as $key => &$value){
+			$value = $extra_glue . self::singleQuote($key) .' => '.self::singleQuote($value);
+		}
+    	unset($value);
+    	return implode($glue, $pieces);
+	}
     /**
      * Add a single quote to all pieces, then implode with the given glue.
      *
