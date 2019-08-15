@@ -72,6 +72,7 @@ class Relations
         // many to many last
         foreach ($this->manyToMany as $foreignKey) {
             $fields = $this->describes[$foreignKey->TABLE_NAME];
+            $junctionFields = [];
             $relations = $this->foreignKeysByTable[$foreignKey->TABLE_NAME];
             foreach ($fields as $field) {
                 if ($field->Key == 'PRI') {
@@ -85,11 +86,13 @@ class Relations
                             }
                         }
                     }
+                } else {
+                    $junctionFields[] = $field->Field;
                 }
             }
             $type = $this->findType($foreignKey, true);
             $junctionTable = $foreignKey->TABLE_NAME;
-            $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix, $namespace, $junctionTable);
+            $this->relations[] = new Relation($type, $remoteField, $remoteTable, $localField, $prefix, $namespace, $junctionTable, $junctionFields);
         }
     }
 

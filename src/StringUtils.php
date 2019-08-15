@@ -28,9 +28,9 @@ abstract class StringUtils
         }
         if (is_array($data)) {
             if (ArrayHelpers::hasStringKeys($data)) {
-                return self::exportAssocArray($data, $indent);
+                return '['.LF.self::exportAssocArray($data, $indent.$indent).$indent.']';
             } else {
-                return self::exportIndexedArray($data, ', ');
+                return '['.self::exportIndexedArray($data, ', ').']';
             }
         }
     }
@@ -109,10 +109,10 @@ abstract class StringUtils
     public static function exportAssocArray(array $data, $indent)
     {
         foreach ($data as $key => &$value) {
-            $value = $indent.$indent.self::singleQuote($key) .' => '.self::singleQuote($value).','.LF;
+            $value = $indent.self::singleQuote($key) .' => '.self::singleQuote($value).','.LF;
         }
         unset($value);
-        return '['.LF.implode($data).$indent.']';
+        return implode($data);
     }
 
     /**
@@ -130,7 +130,7 @@ abstract class StringUtils
         }
         unset($piece);
 
-        return '['.implode($glue, $data).']';
+        return implode($glue, $data);
     }
 
     /**

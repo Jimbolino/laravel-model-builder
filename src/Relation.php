@@ -13,6 +13,7 @@ class Relation
     protected $remoteFunction;
     protected $remoteClass;
     protected $junctionTable;
+    protected $junctionFields;
 
     /**
      * Create a relation object.
@@ -25,7 +26,7 @@ class Relation
      * @param $namespace
      * @param string $junctionTable
      */
-    public function __construct($type, $remoteField, $remoteTable, $localField, $prefix, $namespace, $junctionTable = '')
+    public function __construct($type, $remoteField, $remoteTable, $localField, $prefix, $namespace, $junctionTable = '', $junctionFields = [])
     {
         $this->type = $type;
         $this->remoteField = $remoteField;
@@ -36,6 +37,7 @@ class Relation
             $this->remoteClass = $namespace.'\\'.$this->remoteClass;
         }
         $this->junctionTable = StringUtils::removePrefix($junctionTable, $prefix);
+        $this->junctionFields = $junctionFields;
 
         if ($this->type == 'belongsToMany') {
             $this->remoteFunction = StringUtils::safePlural($this->remoteFunction);
@@ -55,19 +57,17 @@ class Relation
         $string .= TAB.TAB.'return $this->'.$this->type.'(';
         $string .= StringUtils::singleQuote($this->remoteClass);
 
+        $withPivot = '';
         if ($this->type == 'belongsToMany') {
             $string .= ', '.StringUtils::export($this->junctionTable);
+            if ($this->junctionFields) {
+                $withPivot = LF;
+                $withPivot .= TAB.TAB.TAB.'->withPivot('.StringUtils::exportIndexedArray($this->junctionFields).')';
+            }
         }
-
-        //if(!NamingConvention::foreignKey($this->remoteField, $this->remoteTable, $this->remoteField)) {
-            $string .= ', '.StringUtils::export($this->remoteField);
-        //}
-
-        //if(!NamingConvention::primaryKey($this->localField)) {
-            $string .= ', '.StringUtils::export($this->localField);
-        //}
-
-        $string .= ');'.LF;
+        $string .= ', '.StringUtils::export($this->remoteField);
+        $string .= ', '.StringUtils::export($this->localField);
+        $string .= ')'.$withPivot.';'.LF;
         $string .= TAB.'}'.LF.LF;
 
         return $string;
