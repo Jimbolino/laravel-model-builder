@@ -169,20 +169,20 @@ class Model
         }
 
         // most fields are considered as fillable
-        $wrap = TAB.'protected $fillable = array('.StringUtils::implodeAndQuote(', ', $this->fillable).');'.LF.LF;
+        $wrap = TAB.'protected $fillable = ['.StringUtils::implodeAndQuote(', ', $this->fillable).'];'.LF.LF;
         $file .= wordwrap($wrap, ModelGenerator::$lineWrap, LF.TAB.TAB);
 
         // all date fields
         if (!empty($this->dates)) {
             $file .= TAB.'public function getDates()'.LF;
             $file .= TAB.'{'.LF;
-            $file .= TAB.TAB.'return array('.StringUtils::implodeAndQuote(', ', $this->dates).');'.LF;
+            $file .= TAB.TAB.'return ['.StringUtils::implodeAndQuote(', ', $this->dates).'];'.LF;
             $file .= TAB.'}'.LF.LF;
         }
 
         // except for the hidden ones
         if (!empty($this->hidden)) {
-            $file .= TAB.'protected $hidden = array('.StringUtils::implodeAndQuote(', ', $this->hidden).');'.LF.LF;
+            $file .= TAB.'protected $hidden = ['.StringUtils::implodeAndQuote(', ', $this->hidden).'];'.LF.LF;
         }
 
         // add all relations
