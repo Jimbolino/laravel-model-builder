@@ -242,11 +242,7 @@ class Model
      */
     protected function isPrimaryKey($field)
     {
-        if ($field->Key == 'PRI') {
-            return true;
-        }
-
-        return false;
+        return $field->Key === 'PRI';
     }
 
     /**
@@ -258,11 +254,7 @@ class Model
      */
     protected function isIncrementing($field)
     {
-        if ($field->Extra == 'auto_increment') {
-            return true;
-        }
-
-        return false;
+        return $field->Extra === 'auto_increment';
     }
 
     /**
@@ -274,11 +266,7 @@ class Model
      */
     protected function isTimestampField($field)
     {
-        if (array_search($field->Field, $this->timestampFields)) {
-            return true;
-        }
-
-        return false;
+        return array_search($field->Field, $this->timestampFields);
     }
 
     /**
@@ -290,11 +278,7 @@ class Model
      */
     protected function isJson($field)
     {
-        if (StringUtils::strContains(['json'], $field->Type)) {
-            return true;
-        }
-
-        return false;
+        return StringUtils::strContains(['json'], $field->Type);
     }
 
     /**
@@ -306,11 +290,7 @@ class Model
      */
     protected function isEnum($field)
     {
-        if (StringUtils::strContains(['enum'], $field->Type)) {
-            return true;
-        }
-
-        return false;
+        return StringUtils::strContains(['enum'], $field->Type);
     }
 
     /**
@@ -322,11 +302,7 @@ class Model
      */
     protected function isDate($field)
     {
-        if (StringUtils::strContains(['date', 'time', 'year'], $field->Type)) {
-            return true;
-        }
-
-        return false;
+        return StringUtils::strContains(['date', 'time', 'year'], $field->Type);
     }
 
     /**
@@ -338,11 +314,7 @@ class Model
      */
     protected function isHidden($field)
     {
-        if (StringUtils::strContains(['hidden', 'secret'], $field->Comment)) {
-            return true;
-        }
-
-        return false;
+        return StringUtils::strContains(['hidden', 'secret'], $field->Comment);
     }
 
     /**
