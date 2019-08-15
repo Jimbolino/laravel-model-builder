@@ -56,15 +56,15 @@ class Relation
         $string .= StringUtils::singleQuote($this->remoteClass);
 
         if ($this->type == 'belongsToMany') {
-            $string .= ', '.StringUtils::singleQuote($this->junctionTable);
+            $string .= ', '.StringUtils::export($this->junctionTable);
         }
 
         //if(!NamingConvention::foreignKey($this->remoteField, $this->remoteTable, $this->remoteField)) {
-            $string .= ', '.StringUtils::singleQuote($this->remoteField);
+            $string .= ', '.StringUtils::export($this->remoteField);
         //}
 
         //if(!NamingConvention::primaryKey($this->localField)) {
-            $string .= ', '.StringUtils::singleQuote($this->localField);
+            $string .= ', '.StringUtils::export($this->localField);
         //}
 
         $string .= ');'.LF;

@@ -8,6 +8,34 @@ namespace Jimbolino\Laravel\ModelBuilder;
 abstract class StringUtils
 {
     /**
+     * @param $data
+     * @param string $indent
+     * @return mixed|string
+     */
+    public static function export($data, $indent = '')
+    {
+        if ($data === false) {
+            return 'false';
+        }
+        if ($data === true) {
+            return 'true';
+        }
+        if ($data === null) {
+            return 'null';
+        }
+        if (is_string($data)) {
+            return self::singleQuote($data);
+        }
+        if (is_array($data)) {
+            if (ArrayHelpers::hasStringKeys($data)) {
+                return self::exportAssocArray($data, $indent);
+            } else {
+                return self::exportIndexedArray($data, ', ');
+            }
+        }
+    }
+
+    /**
      * Add single quotes around a string.
      *
      * @param $string
@@ -16,10 +44,6 @@ abstract class StringUtils
      */
     public static function singleQuote($string)
     {
-        if ($string === 'null') {
-            return $string;
-        }
-
         return "'".$string."'";
     }
 
@@ -82,31 +106,31 @@ abstract class StringUtils
         return false;
     }
 
-    public static function implodeKeyValueAndQuote($glue, $pieces)
+    public static function exportAssocArray(array $data, $indent)
     {
-        foreach ($pieces as $key => &$value) {
-            $value = self::singleQuote($key) .' => '.self::singleQuote($value);
+        foreach ($data as $key => &$value) {
+            $value = $indent.$indent.self::singleQuote($key) .' => '.self::singleQuote($value).','.LF;
         }
         unset($value);
-        return implode($glue, $pieces);
+        return '['.LF.implode($data).$indent.']';
     }
 
     /**
      * Add a single quote to all pieces, then implode with the given glue.
      *
+     * @param $data
      * @param $glue
-     * @param $pieces
      *
      * @return string
      */
-    public static function implodeAndQuote($glue, $pieces)
+    public static function exportIndexedArray(array $data, $glue = ', ')
     {
-        foreach ($pieces as &$piece) {
+        foreach ($data as &$piece) {
             $piece = self::singleQuote($piece);
         }
         unset($piece);
 
-        return implode($glue, $pieces);
+        return '['.implode($glue, $data).']';
     }
 
     /**

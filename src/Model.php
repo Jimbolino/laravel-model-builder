@@ -138,51 +138,49 @@ class Model
         foreach ($this->enum as $fieldName => $field) {
             foreach ($field as $const) {
                 $key = strtoupper($fieldName).'_'.strtoupper($const);
-                $file .= TAB.'const '.$key.' = '.StringUtils::singleQuote($const).';'.LF;
+                $file .= TAB.'const '.$key.' = '.StringUtils::export($const).';'.LF;
             }
             $file .= LF;
         }
 
         // the name of the mysql table
-        $file .= TAB.'protected $table = '.StringUtils::singleQuote($this->table).';'.LF.LF;
+        $file .= TAB.'protected $table = '.StringUtils::export($this->table).';'.LF.LF;
 
         // primary key defaults to "id"
         if ($this->primaryKey !== 'id') {
-            $file .= TAB.'public $primaryKey = '.StringUtils::singleQuote($this->primaryKey).';'.LF.LF;
+            $file .= TAB.'public $primaryKey = '.StringUtils::export($this->primaryKey).';'.LF.LF;
         }
 
         // timestamps defaults to true
         if (!$this->timestamps) {
-            $file .= TAB.'public $timestamps = '.var_export($this->timestamps, true).';'.LF.LF;
+            $file .= TAB.'public $timestamps = '.StringUtils::export($this->timestamps).';'.LF.LF;
         }
 
         // incrementing defaults to true
         if (!$this->incrementing) {
-            $file .= TAB.'public $incrementing = '.var_export($this->incrementing, true).';'.LF.LF;
+            $file .= TAB.'public $incrementing = '.StringUtils::export($this->incrementing).';'.LF.LF;
         }
 
         // add casts
         if (!empty($this->casts)) {
-            $file .= TAB.'protected $casts = [' .LF;
-            $file .= TAB.TAB.StringUtils::implodeKeyValueAndQuote(','.LF.TAB.TAB, $this->casts).','.LF;
-            $file .= TAB.'];'.LF.LF;
+            $file .= TAB.'protected $casts = '.StringUtils::export($this->casts, TAB).';'.LF.LF;
         }
 
         // most fields are considered as fillable
-        $wrap = TAB.'protected $fillable = ['.StringUtils::implodeAndQuote(', ', $this->fillable).'];'.LF.LF;
+        $wrap = TAB.'protected $fillable = '.StringUtils::export($this->fillable).';'.LF.LF;
         $file .= wordwrap($wrap, ModelGenerator::$lineWrap, LF.TAB.TAB);
+
+        // except for the hidden ones
+        if (!empty($this->hidden)) {
+            $file .= TAB.'protected $hidden = '.StringUtils::export($this->hidden).';'.LF.LF;
+        }
 
         // all date fields
         if (!empty($this->dates)) {
             $file .= TAB.'public function getDates()'.LF;
             $file .= TAB.'{'.LF;
-            $file .= TAB.TAB.'return ['.StringUtils::implodeAndQuote(', ', $this->dates).'];'.LF;
+            $file .= TAB.TAB.'return '.StringUtils::export($this->dates).';'.LF;
             $file .= TAB.'}'.LF.LF;
-        }
-
-        // except for the hidden ones
-        if (!empty($this->hidden)) {
-            $file .= TAB.'protected $hidden = ['.StringUtils::implodeAndQuote(', ', $this->hidden).'];'.LF.LF;
         }
 
         // add all relations
