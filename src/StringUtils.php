@@ -2,6 +2,8 @@
 
 namespace Jimbolino\Laravel\ModelBuilder;
 
+use Illuminate\Support\Str;
+
 /**
  * Class StringUtils, some handy string functions.
  */
@@ -155,7 +157,7 @@ abstract class StringUtils
      */
     public static function safePlural($value)
     {
-        $plural = str_plural($value);
+        $plural = Str::plural($value);
         if ($plural == $value) {
             $plural = $value.'s';
             echo 'warning: automatic pluralization of '.$value.' failed, using '.$plural.LF;
