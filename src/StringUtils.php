@@ -63,7 +63,10 @@ abstract class StringUtils
             $table = self::removePrefix($table, $prefix);
         }
 
-        return self::underscoresToCamelCase($table, true);
+        $camel = self::underscoresToCamelCase($table, true);
+        $singular = self::safeSingular($camel);
+
+        return $singular;
     }
 
     /**
@@ -164,5 +167,22 @@ abstract class StringUtils
         }
 
         return $plural;
+    }
+
+    /**
+     * Use laravel singularization, and if that one fails give a warning.
+     *
+     * @param $value
+     *
+     * @return string
+     */
+    public static function safeSingular($value)
+    {
+        $singular = str_singular($value);
+        if ($singular == $value) {
+            echo 'warning: automatic singularization of '.$value.' failed, using '.$singular.LF;
+        }
+
+        return $singular;
     }
 }
